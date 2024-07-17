@@ -4,8 +4,9 @@ pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sourceDirectoryNifti = os.path.join(pipelineDirectory, 'nifti')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
+sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 
-singularityCommand = f'singularity exec {os.path.join(sifDirectory, 'dsistudio_latest.sif')}'
+singularityCommand = f'singularity exec {sifFile}'
 
 ## run src process using b10, b2000, b4000 for each subject
 for subjID in os.listdir(sourceDirectoryNifti):
