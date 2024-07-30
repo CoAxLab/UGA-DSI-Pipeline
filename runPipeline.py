@@ -53,9 +53,15 @@ for subjID in os.listdir(outputDirectorySRC):
     srcFileS = os.path.join(pipelineDirectory, 'src', subjID, f'{subjID}_hyper3.nii.gz.src.gz')
     srcFileR = os.path.join(pipelineDirectory, 'src', subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
     # fib output file
+    subjRecOutDirectory = os.path.join(reconOutputDirectory, subjID)
+    try:
+        os.mkdir(subjRecOutDirectory)
+    except FileExistsError:
+        print(f'\nrecon action already complete for subject: {subjID}.....\n')
+        continue
     #fibFile = os.path.join(reconOutputDirectory, subjID, f'{subjID}_')
     settings = '--cmd="[Step T2][Corrections][TOPUP EDDY]+[Step T2][Corrections][EDDY]" --method=4 --param0=1.25 --motion_correction=1 --method=7 --param0=1.00 --template=0'
-    reconCommand = f'dsi_studio ==action=rec --source={srcFileS} rev_pe={srcFileR} {settings} --output={reconOutputDirectory}'
+    reconCommand = f'dsi_studio ==action=rec --source={srcFileS} rev_pe={srcFileR} {settings} --output={subjRecOutDirectory}'
 
     fullRecCommand = f'{singularityCommand} {reconCommand}'
     print(f'\nRunning DSI Studio recon action for subject: {subjID}.....\n')
