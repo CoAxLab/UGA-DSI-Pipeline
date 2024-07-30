@@ -6,7 +6,8 @@ pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sourceDirectoryNifti = os.path.join(pipelineDirectory, 'nifti')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
-for path in [sifDirectory, sourceDirectoryNifti, outputDirectorySRC]:
+outputDirectoryFIB = os.path.join(pipelineDirectory, 'fib')
+for path in [sifDirectory, sourceDirectoryNifti, outputDirectorySRC, outputDirectoryFIB]:
     try:
         os.mkdir(path)
         print(f'\nCreated directory at: {path}!')
