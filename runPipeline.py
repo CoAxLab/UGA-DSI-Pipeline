@@ -19,7 +19,7 @@ for subjID in os.listdir(sourceDirectoryNifti):
     try:
         os.mkdir(os.path.join(outputDirectorySRC, subjID))
     except FileExistsError:
-        print(f'\nsrc standard action already complete for subject: {subjID}!\n')
+        print(f'\nsrc action already complete for subject: {subjID}!\n')
         continue
     srcCommandStandard = f'dsi_studio --action=src --source={b10File} --other_source={b2000File},{b4000File} --output={srcFile}'
 
@@ -29,23 +29,18 @@ for subjID in os.listdir(sourceDirectoryNifti):
     b4000FileR = os.path.join(sourceDirectoryNifti, subjID, 'x_b4000_hyper3.nii.gz')
     # reversed output file:
     srcFileR = os.path.join(outputDirectorySRC, subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
-    try:
-        os.mkdir(os.path.join(outputDirectorySRC, subjID))
-    except FileExistsError:
-        print(f'\nsrc reversed action already complete for subject: {subjID}!\n')
-        continue
 
     srcCommandReversed = f'dsi_studio --action=src --source={b10FileR} --other_source={b2000FileR},{b4000FileR} --output={srcFileR}'
 
     fullCommandS = f'{singularityCommand} {srcCommandStandard}'
     print(f'\nRunning DSI Studio src standard action for subject: {subjID}.....\n')
     os.system(fullCommandS)
-    print(f'\n{subjID} standard src complete!\n')
+    print(f'\n{subjID} standard src exited!\n')
 
     fullCommandR = f'{singularityCommand} {srcCommandReversed}'
     print(f'\nRunning DSI Studio src reversed action for subject: {subjID}.....\n')
     os.system(fullCommandR)
-    print(f'\n{subjID} reversed src complete!\n')
+    print(f'\n{subjID} reversed src exited!\n')
 
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 for subjID in os.listdir(outputDirectorySRC):
@@ -54,16 +49,18 @@ for subjID in os.listdir(outputDirectorySRC):
     srcFileR = os.path.join(pipelineDirectory, 'src', subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
     # fib output file
     subjRecOutDirectory = os.path.join(reconOutputDirectory, subjID)
+    fibFileOutput = os.path.join(subjRecOutDirectory, f'{subjID}_hyper3.icbm152_adult.qsdr.1.25.fib.gz')
     try:
         os.mkdir(subjRecOutDirectory)
     except FileExistsError:
         print(f'\nrecon action already complete for subject: {subjID}.....\n')
         continue
     #fibFile = os.path.join(reconOutputDirectory, subjID, f'{subjID}_')
-    settings = '--cmd="[Step T2][Corrections][TOPUP EDDY]+[Step T2][Corrections][EDDY]" --method=4 --param0=1.25 --motion_correction=1 --method=7 --param0=1.00 --template=0'
-    reconCommand = f'dsi_studio ==action=rec --source={srcFileS} rev_pe={srcFileR} {settings} --output={subjRecOutDirectory}'
+    settings = '--method=7 --param0=1.25 --template=0'
+    reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} {settings} --output={fibFileOutput}'
 
     fullRecCommand = f'{singularityCommand} {reconCommand}'
     print(f'\nRunning DSI Studio recon action for subject: {subjID}.....\n')
+    os.chdir(os.path.join(outputDirectorySRC, subjID))
     os.system(fullRecCommand)
-    print(f'\n{subjID} recon complete!\n')
+    print(f'\n{subjID} recon exited!\n')
