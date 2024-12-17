@@ -1,0 +1,11 @@
+{
+    "descriptions": [
+        {
+            "datatype": "dwi",
+            "suffix": "dwi",
+            "criteria": {
+                "SeriesDescription": "R-L_DTI_64dir_plus_5B0"
+            }
+        }
+    ]
+}

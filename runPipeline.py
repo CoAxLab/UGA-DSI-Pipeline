@@ -1,4 +1,5 @@
 import os
+import time
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
@@ -44,6 +45,7 @@ for subjID in os.listdir(sourceDirectoryNifti):
 
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 for subjID in os.listdir(outputDirectorySRC):
+    start = time.time()
     # src files for input
     srcFileS = os.path.join(pipelineDirectory, 'src', subjID, f'{subjID}_hyper3.nii.gz.src.gz')
     srcFileR = os.path.join(pipelineDirectory, 'src', subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
@@ -56,11 +58,12 @@ for subjID in os.listdir(outputDirectorySRC):
         print(f'\nrecon action already complete for subject: {subjID}.....\n')
         continue
     #fibFile = os.path.join(reconOutputDirectory, subjID, f'{subjID}_')
-    settings = '--method=7 --param0=1.25 --template=0'
-    reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} {settings} --output={fibFileOutput}'
+    #settings = '--method=7 --param0=1.25 --template=0 --qsdr_reso=2.0'
+    reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput}'
 
     fullRecCommand = f'{singularityCommand} {reconCommand}'
     print(f'\nRunning DSI Studio recon action for subject: {subjID}.....\n')
     os.chdir(os.path.join(outputDirectorySRC, subjID))
     os.system(fullRecCommand)
-    print(f'\n{subjID} recon exited!\n')
+    end = time.time()
+    print(f'\n{subjID} recon exited in {end - start} seconds!\n')

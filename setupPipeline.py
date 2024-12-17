@@ -17,6 +17,7 @@ for path in [sifDirectory, sourceDirectoryNifti, outputDirectorySRC, outputDirec
 # pull SIF file for dsi studio
 os.chdir(sifDirectory)
 os.system('singularity pull docker://dsistudio/dsistudio:latest')
+os.system('singularity pull docker://nipreps/mriqc:latest')
 os.chdir(pipelineDirectory)
 
 print(f'\n\nSet-Up complete!')
