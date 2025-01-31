@@ -4,7 +4,28 @@
             "datatype": "dwi",
             "suffix": "dwi",
             "criteria": {
-                "SeriesDescription": "R-L_DTI_64dir_plus_5B0"
+                "SeriesDescription": "*hyper*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "criteria": {
+                "SeriesDescription": "*T2*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T1w",
+            "criteria": {
+                "SeriesDescription": "*T1*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "loc",
+            "criteria": {
+                "SeriesDescription": ["*loc*", "*calibration*"]
             }
         }
     ]

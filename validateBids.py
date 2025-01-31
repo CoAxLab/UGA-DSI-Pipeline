@@ -16,19 +16,7 @@ singularityCommand = f'singularity exec {sifFile}'
 for subjID in os.listdir(sourceDirectoryBids):
     print(subjID)
     currBidsDir = os.path.join(sourceDirectoryBids, subjID)
+    BIDSValidator().is_bids(currBidsDir)
     print(BIDSValidator().is_bids(currBidsDir))
-    qcCommand = f'{singularityCommand} mriqc {currBidsDir} {outDirectoryQC} participant --participant-label {subjID}'
-    os.system(qcCommand)
-#     if subjID[0:3] != 'sub': 
-#         print(f'skipping {subjID}')
-#         continue
-#     nextDir = os.path.join(sourceDirectoryBids, subjID)
-#     print(BIDSValidator().is_bids(nextDir))
-#     print(nextDir)
-    # try:
-    #     for file in os.listdir(nextDir):
-    #         print(BIDSValidator().is_bids(os.path.join(nextDir, file)))
-    # except NotADirectoryError:
-    #     print('not a directory')
-    
-   
+    #qcCommand = f'{singularityCommand} mriqc {currBidsDir} {outDirectoryQC} participant --participant-label {subjID}'
+    #os.system(qcCommand)
