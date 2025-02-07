@@ -3,7 +3,7 @@ import time
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
-sourceDirectoryNifti = os.path.join(pipelineDirectory, 'nifti')
+sourceDirectoryNifti = os.path.join(pipelineDirectory, 'bids')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 
@@ -12,7 +12,7 @@ singularityCommand = f'singularity exec {sifFile}'
 ## run src process using b10, b2000, b4000 for each subject
 for subjID in os.listdir(sourceDirectoryNifti):
     # source files:
-    b10File = os.path.join(sourceDirectoryNifti, subjID, 'b10_hyper3.nii.gz')
+    b10File = os.path.join(sourceDirectoryNifti, subjID, f'sub-{subjID}', 'dwi' , 'b10_hyper3.nii.gz')
     b2000File = os.path.join(sourceDirectoryNifti, subjID, 'b2000_hyper3.nii.gz')
     b4000File = os.path.join(sourceDirectoryNifti, subjID, 'b4000_hyper3.nii.gz')
     # output file:
