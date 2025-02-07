@@ -1,3 +1,6 @@
+QCOutput/*
+work/*
+BIDS
 convertToBids
 bids
 nifti
