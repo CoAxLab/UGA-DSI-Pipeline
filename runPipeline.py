@@ -3,35 +3,36 @@ import time
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
-sourceDirectoryNifti = os.path.join(pipelineDirectory, 'bids')
+sourceDirectory = os.path.join(pipelineDirectory, 'BIDS')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 
 singularityCommand = f'singularity exec {sifFile}'
 
 ## run src process using b10, b2000, b4000 for each subject
-for subjID in os.listdir(sourceDirectoryNifti):
+for subjID in os.listdir(sourceDirectory):
+    if 'sub-' not in subjID: continue
     # source files:
-    b10File = os.path.join(sourceDirectoryNifti, subjID, f'sub-{subjID}', 'dwi' , 'b10_hyper3.nii.gz')
-    b2000File = os.path.join(sourceDirectoryNifti, subjID, 'b2000_hyper3.nii.gz')
-    b4000File = os.path.join(sourceDirectoryNifti, subjID, 'b4000_hyper3.nii.gz')
+    lowStandard = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-lowb_dwi.nii.gz')
+    midStandard = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-midb_dwi.nii.gz')
+    highSandard = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-highb_dwi.nii.gz')
     # output file:
-    srcFile = os.path.join(outputDirectorySRC, subjID, f'{subjID}_hyper3.nii.gz.src.gz')
+    subjectSRCDir = os.path.join(outputDirectorySRC, subjID)
     try:
-        os.mkdir(os.path.join(outputDirectorySRC, subjID))
+        os.mkdir(subjectSRCDir)
     except FileExistsError:
         print(f'\nsrc action already complete for subject: {subjID}!\n')
         continue
-    srcCommandStandard = f'dsi_studio --action=src --source={b10File} --other_source={b2000File},{b4000File} --output={srcFile}'
+    srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={os.path.join(subjectSRCDir, f'sub-{subjID}_dir-std.src.gz')}'
 
     # reversed source files:
-    b10FileR = os.path.join(sourceDirectoryNifti, subjID, 'x_b10_hyper3.nii.gz')
-    b2000FileR = os.path.join(sourceDirectoryNifti, subjID, 'x_b2000_hyper3.nii.gz')
-    b4000FileR = os.path.join(sourceDirectoryNifti, subjID, 'x_b4000_hyper3.nii.gz')
+    lowReverse = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
+    midReverse = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-midb_dwi.nii.gz')
+    highReverse = os.path.join(sourceDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-highb_dwi.nii.gz')
     # reversed output file:
     srcFileR = os.path.join(outputDirectorySRC, subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
 
-    srcCommandReversed = f'dsi_studio --action=src --source={b10FileR} --other_source={b2000FileR},{b4000FileR} --output={srcFileR}'
+    srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={srcFileR}'
 
     fullCommandS = f'{singularityCommand} {srcCommandStandard}'
     print(f'\nRunning DSI Studio src standard action for subject: {subjID}.....\n')
