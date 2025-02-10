@@ -13,9 +13,9 @@ singularityCommand = f'singularity exec {sifFile}'
 for subjID in os.listdir(bidsDirectory):
     if 'sub-' not in subjID: continue
     # source files:
-    lowStandard = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-lowb_dwi.nii.gz')
-    midStandard = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-midb_dwi.nii.gz')
-    highSandard = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-highb_dwi.nii.gz')
+    lowStandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-lowb_dwi.nii.gz')
+    midStandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-midb_dwi.nii.gz')
+    highSandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-highb_dwi.nii.gz')
     # output file:
     subjectSRCDir = os.path.join(outputDirectorySRC, subjID)
     try:
@@ -23,15 +23,15 @@ for subjID in os.listdir(bidsDirectory):
     except FileExistsError:
         print(f'\nsrc action already complete for subject: {subjID}!\n')
         continue
-    stdOutFile = os.path.join(subjectSRCDir, f'sub-{subjID}_dir-std.src.gz')
+    stdOutFile = os.path.join(subjectSRCDir, f'{subjID}_dir-std.src.gz')
     srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
 
     # reversed source files:
-    lowReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
-    midReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-midb_dwi.nii.gz')
-    highReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-highb_dwi.nii.gz')
+    lowReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
+    midReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-midb_dwi.nii.gz')
+    highReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-highb_dwi.nii.gz')
     # reversed output file:
-    revOutFile = os.path.join(subjectSRCDir, f'sub-{subjID}_dir-rev.src.gz')
+    revOutFile = os.path.join(subjectSRCDir, f'{subjID}_dir-rev.src.gz')
 
     srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
@@ -59,7 +59,7 @@ for subjID in os.listdir(outputDirectorySRC):
             stdFileName = file
     srcFileS = os.path.join(subjSrcInDirectory, stdFileName)
     srcFileR = os.path.join(subjSrcInDirectory, revFileName)
-    fibFileOutput = os.path.join(subjRecOutDirectory, f'sub-{subjID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
+    fibFileOutput = os.path.join(subjRecOutDirectory, f'{subjID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
 
     try:
         os.mkdir(subjRecOutDirectory)
