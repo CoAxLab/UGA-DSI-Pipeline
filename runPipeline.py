@@ -52,7 +52,7 @@ for subjID in os.listdir(outputDirectorySRC):
     subjRecOutDirectory = os.path.join(reconOutputDirectory, subjID) # fib/subject/
     subjSrcInDirectory = os.path.join(outputDirectorySRC, subjID) # src/subject/
     # src files for input
-    for file in subjSrcInDirectory:
+    for file in os.listdir(subjSrcInDirectory):
         if 'rev' in file:
             revFileName = file
         elif 'std' in file:
