@@ -13,9 +13,9 @@ singularityCommand = f'singularity exec {sifFile}'
 for subjID in os.listdir(bidsDirectory):
     if 'sub-' not in subjID: continue
     # source files:
-    lowStandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-lowb_dwi.nii.gz')
-    midStandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-midb_dwi.nii.gz')
-    highSandard = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-std_acq-highb_dwi.nii.gz')
+    lowStandard = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-std_acq-lowb_dwi.nii.gz')
+    midStandard = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-std_acq-midb_dwi.nii.gz')
+    highSandard = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-std_acq-highb_dwi.nii.gz')
     # output file:
     subjectSRCDir = os.path.join(outputDirectorySRC, subjID)
     try:
@@ -27,9 +27,9 @@ for subjID in os.listdir(bidsDirectory):
     srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
 
     # reversed source files:
-    lowReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
-    midReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-midb_dwi.nii.gz')
-    highReverse = os.path.join(bidsDirectory, subjID, f'{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-highb_dwi.nii.gz')
+    lowReverse = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
+    midReverse = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-rev_acq-midb_dwi.nii.gz')
+    highReverse = os.path.join(bidsDirectory, subjID, 'dwi' , f'{subjID}_dir-rev_acq-highb_dwi.nii.gz')
     # reversed output file:
     revOutFile = os.path.join(subjectSRCDir, f'{subjID}_dir-rev.src.gz')
 
