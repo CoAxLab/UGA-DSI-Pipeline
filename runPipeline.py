@@ -23,16 +23,17 @@ for subjID in os.listdir(bidsDirectory):
     except FileExistsError:
         print(f'\nsrc action already complete for subject: {subjID}!\n')
         continue
-    srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={os.path.join(subjectSRCDir, f'sub-{subjID}_dir-std.src.gz')}'
+    stdOutFile = os.path.join(subjectSRCDir, f'sub-{subjID}_dir-std.src.gz')
+    srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
 
     # reversed source files:
     lowReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-lowb_dwi.nii.gz')
     midReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-midb_dwi.nii.gz')
     highReverse = os.path.join(bidsDirectory, subjID, f'sub-{subjID}', 'dwi' , f'sub-{subjID}_dir-rev_acq-highb_dwi.nii.gz')
     # reversed output file:
-    srcFileR = os.path.join(outputDirectorySRC, subjID, f'{subjID}_x_hyper3.nii.gz.src.gz')
+    revOutFile = os.path.join(subjectSRCDir, f'sub-{subjID}_dir-rev.src.gz')
 
-    srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={os.path.join(subjectSRCDir, f'sub-{subjID}_dir-rev.src.gz')}'
+    srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
     fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
     print(f'\nRunning DSI Studio src standard action for subject: {subjID}.....\n')
