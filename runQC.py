@@ -19,6 +19,5 @@ singularityCommand = f'singularity exec {sifFile}'
 #    print(subjID)
 #    currBidsDir = os.path.join(sourceDirectoryBids, subjID)
 #print(BIDSValidator().is_bids(currBidsDir))
-qcCommand = f'{singularityCommand} mriqc {sourceDirectoryBids} {outDirectoryQC} participant --participant-label DXSP008'
+qcCommand = f'{singularityCommand} mriqc {sourceDirectoryBids} {outDirectoryQC} participant'
 os.system(qcCommand)
-   
