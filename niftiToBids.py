@@ -82,6 +82,10 @@ for subjID in os.listdir(niftiDirectory):
     
     print(os.listdir(currNifti))
     for fileToMove in os.listdir(currNifti):
+        '''change the content of the below statement between passs and continue based on desire for b10 files in output'''
+        if 'lowb' in fileToMove:
+            continue
+            #pass
         # Begin sorting files from nifti directory
         oldFile = os.path.join(currNifti, fileToMove)
         newFile, destination = getFileName(fileToMove, subjID)
