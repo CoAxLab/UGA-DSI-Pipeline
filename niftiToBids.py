@@ -89,13 +89,19 @@ for subjID in os.listdir(niftiDirectory):
         # Begin sorting files from nifti directory
         oldFile = os.path.join(currNifti, fileToMove)
         newFile, destination = getFileName(fileToMove, subjID)
-        match destination:
-            case 'anat':
-                toHere = os.path.join(anatDir, newFile)
-            case 'dwi':
-                toHere = os.path.join(dwiDir, newFile)
-            case None:
-                continue
+        if destination == 'anat':
+            toHere = os.path.join(anatDir, newFile)
+        elif destination == 'dwi':
+            toHere = os.path.join(dwiDir, newFile)
+        elif destination == None:
+            continue
+        # match destination:
+        #     case 'anat':
+        #         toHere = os.path.join(anatDir, newFile)
+        #     case 'dwi':
+        #         toHere = os.path.join(dwiDir, newFile)
+        #     case None:
+        #         continue
         copyCMD = f'cp {oldFile} {toHere}'
         print(copyCMD)
         os.system(copyCMD)
