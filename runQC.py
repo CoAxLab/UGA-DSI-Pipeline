@@ -1,5 +1,5 @@
 import os
-from bids_validator import BIDSValidator
+#from bids_validator import BIDSValidator
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
