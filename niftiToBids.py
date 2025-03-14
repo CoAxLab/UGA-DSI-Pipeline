@@ -17,7 +17,7 @@ if setup:
 
 def getFileName(file, sub):
     '''returns (newFilename, destination)'''
-    newName = f'sub-{sub}'
+    newName = f'{sub}'
 
     # ignore unneeded
     skipThese = ['ORIG', 'Calibration', '.mat', '.txt']
@@ -68,40 +68,46 @@ def getFileName(file, sub):
 
 
 for subjID in os.listdir(niftiDirectory):
+    currSubDir = os.path.join(niftiDirectory, subjID)
     outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
-    currNifti = os.path.join(niftiDirectory, subjID)
-    anatDir = os.path.join(outDirectory, 'anat')
-    dwiDir = os.path.join(outDirectory, 'dwi')
     try:
         os.mkdir(outDirectory)
     except Exception as e:
         print(f'{e}\nMoving on from participant {subjID}...')
         continue
-    os.mkdir(anatDir)
-    os.mkdir(dwiDir)
-    
-    print(os.listdir(currNifti))
-    for fileToMove in os.listdir(currNifti):
-        '''change the content of the below statement between passs and continue based on desire for b10 files in output'''
-        if 'lowb' in fileToMove:
-            continue
-            #pass
-        # Begin sorting files from nifti directory
-        oldFile = os.path.join(currNifti, fileToMove)
-        newFile, destination = getFileName(fileToMove, subjID)
-        if destination == 'anat':
-            toHere = os.path.join(anatDir, newFile)
-        elif destination == 'dwi':
-            toHere = os.path.join(dwiDir, newFile)
-        elif destination == None:
-            continue
-        # match destination:
-        #     case 'anat':
-        #         toHere = os.path.join(anatDir, newFile)
-        #     case 'dwi':
-        #         toHere = os.path.join(dwiDir, newFile)
-        #     case None:
-        #         continue
-        copyCMD = f'cp {oldFile} {toHere}'
-        print(copyCMD)
-        os.system(copyCMD)
+    for sesID in os.listdir(currSubDir):
+        currNifti = os.path.join(currSubDir, sesID)
+        sesOutDir = os.path.join(outDirectory, f'ses-{sesID}')
+        os.mkdir(sesOutDir)
+
+        anatDir = os.path.join(sesOutDir, 'anat')
+        dwiDir = os.path.join(sesOutDir, 'dwi')
+        os.mkdir(anatDir)
+        os.mkdir(dwiDir)
+        
+        #print(os.listdir(currNifti))
+        for fileToMove in os.listdir(currNifti):
+            '''change the content of the below statement between passs and continue based on desire for b10 files in output'''
+            if 'b10_' in fileToMove:
+                continue
+                #pass
+            # Begin sorting files from nifti directory
+            oldFile = os.path.join(currNifti, fileToMove)
+            subSesTag = f'sub-{subjID}_ses-{sesID}'
+            newFile, destination = getFileName(fileToMove, subSesTag)
+            if destination == 'anat':
+                toHere = os.path.join(anatDir, newFile)
+            elif destination == 'dwi':
+                toHere = os.path.join(dwiDir, newFile)
+            elif destination == None:
+                continue
+            # match destination:
+            #     case 'anat':
+            #         toHere = os.path.join(anatDir, newFile)
+            #     case 'dwi':
+            #         toHere = os.path.join(dwiDir, newFile)
+            #     case None:
+            #         continue
+            copyCMD = f'cp {oldFile} {toHere}'
+            print(copyCMD)
+            os.system(copyCMD)
