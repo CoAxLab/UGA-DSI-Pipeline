@@ -10,8 +10,9 @@ try:
 except Exception as e:
     print(f'\nmoving on...\n')
 if setup:
+    os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, 'dataset_description.json')}')
     os.chdir(parentBIDS)
-    os.system('touch dataset_description.json')
+    #os.system('touch dataset_description.json')
     os.system('touch participants.tsv')
     os.chdir(pipelineDirectory)
 
