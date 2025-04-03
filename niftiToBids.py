@@ -9,8 +9,9 @@ try:
     setup = True
 except Exception as e:
     print(f'\nmoving on...\n')
+descFName = 'dataset_description.json'
 if setup:
-    os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, 'dataset_description.json')}')
+    os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, descFName)}')
     os.chdir(parentBIDS)
     #os.system('touch dataset_description.json')
     os.system('touch participants.tsv')
@@ -76,9 +77,11 @@ for subjID in os.listdir(niftiDirectory):
     except Exception as e:
         print(f'{e}\nMoving on from participant {subjID}...')
         continue
+
+    sesN = 1
     for sesID in os.listdir(currSubDir):
         currNifti = os.path.join(currSubDir, sesID)
-        sesOutDir = os.path.join(outDirectory, f'ses-{sesID}')
+        sesOutDir = os.path.join(outDirectory, f'ses-{sesN}')
         os.mkdir(sesOutDir)
 
         anatDir = os.path.join(sesOutDir, 'anat')
@@ -94,7 +97,7 @@ for subjID in os.listdir(niftiDirectory):
                 #pass
             # Begin sorting files from nifti directory
             oldFile = os.path.join(currNifti, fileToMove)
-            subSesTag = f'sub-{subjID}_ses-{sesID}'
+            subSesTag = f'sub-{subjID}_ses-{sesN}'
             newFile, destination = getFileName(fileToMove, subSesTag)
             if destination == 'anat':
                 toHere = os.path.join(anatDir, newFile)
@@ -112,3 +115,4 @@ for subjID in os.listdir(niftiDirectory):
             copyCMD = f'cp {oldFile} {toHere}'
             print(copyCMD)
             os.system(copyCMD)
+        sesN += 1
