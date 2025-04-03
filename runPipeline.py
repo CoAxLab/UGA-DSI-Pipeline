@@ -43,13 +43,13 @@ for subjID in os.listdir(bidsDirectory):
         fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
         print(f'\nRunning DSI Studio src standard action for subject: {subjID}.....\n')
         print(fullCommandStandard)
-        #os.system(fullCommandStandard)
+        os.system(fullCommandStandard)
         print(f'\n{subjID} standard src exited!\n')
 
         fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
         print(f'\nRunning DSI Studio src reversed action for subject: {subjID}.....\n')
         print(fullCommandReversed)
-        #os.system(fullCommandReversed)
+        os.system(fullCommandReversed)
         print(f'\n{subjID} reversed src exited!\n')
 
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
@@ -86,7 +86,7 @@ for subjID in os.listdir(outputDirectorySRC):
         print(f'\nRunning DSI Studio recon action for subject: {subjID}.....\n')
         os.chdir(os.path.join(outputDirectorySRC, subjID))
         print(fullRecCommand)
-        #os.system(fullRecCommand)
+        os.system(fullRecCommand)
         end = time.time()
         print(f'\n{subjID} recon exited in {end - start} seconds!\n')
         os.chdir(pipelineDirectory)
