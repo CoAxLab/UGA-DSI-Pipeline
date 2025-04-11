@@ -63,7 +63,7 @@ for subjID in os.listdir(outputDirectorySRC):
         print(f'\nrecon action already complete for subject: {subjID}.....\n')
         continue
 
-    for ses in subInputDir:
+    for ses in os.listdir(subInputDir):
         currSesSRCDir = os.path.join(subInputDir, ses)
         subjRecOutDirectory = os.path.join(reconOutputDirectory, subjID) # fib/subject/
         
