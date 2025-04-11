@@ -67,9 +67,10 @@ def getFileName(file, sub):
     if '.' in newName: return newName, dest
     else: return None, None
 
-
+allSubIDs = []
 
 for subjID in os.listdir(niftiDirectory):
+    allSubIDs.append(subjID)
     currSubDir = os.path.join(niftiDirectory, subjID)
     outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
     try:
@@ -93,8 +94,8 @@ for subjID in os.listdir(niftiDirectory):
         for fileToMove in os.listdir(currNifti):
             '''change the content of the below statement between passs and continue based on desire for b10 files in output'''
             if 'b10_' in fileToMove:
-                continue
-                #pass
+                #continue
+                pass
             # Begin sorting files from nifti directory
             oldFile = os.path.join(currNifti, fileToMove)
             subSesTag = f'sub-{subjID}_ses-{sesN}'
@@ -118,8 +119,26 @@ for subjID in os.listdir(niftiDirectory):
         sesN += 1
 
 qcBids = os.path.join(pipelineDirectory, 'qcBIDS')
-try:
-    os.mkdir(qcBids)
-    os.system(f'cp -r {parentBIDS} {qcBids}')
-except Exception as e:
-    print(f'{e}\n\nNot creating qcBIDS directory as it already exists\n')
+
+os.system(f'cp -r {parentBIDS} {qcBids}')
+
+
+for id in allSubIDs:
+    # attempts to remove lowb files from qcBIDS directory
+    dwiDirS1 = os.path.join(pipelineDirectory, 'qcBIDS', f'sub-{id}', 'ses-1', 'dwi')
+    dwiDirS2 = os.path.join(pipelineDirectory, 'qcBIDS', f'sub-{id}', 'ses-2', 'dwi')
+    if os.path.isdir(dwiDirS1):
+        for f in os.listdir(dwiDirS1):
+            if 'lowb' in f:
+                try:
+                    os.remove(os.path.join(dwiDirS1, f))
+                except Exception as e:
+                    print(e)
+
+    if os.path.isdir(dwiDirS2):
+        for f in os.listdir(dwiDirS2):
+            if 'lowb' in f:
+                try:
+                    os.remove(os.path.join(dwiDirS2, f))
+                except Exception as e:
+                    print(e)
