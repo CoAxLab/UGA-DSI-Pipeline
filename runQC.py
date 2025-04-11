@@ -1,23 +1,27 @@
 import os
-#from bids_validator import BIDSValidator
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sourceDirectoryBids = os.path.join(pipelineDirectory, 'BIDS')
 outDirectoryQC = os.path.join(pipelineDirectory, 'QCOutput')
+workDirectory = os.path.join(pipelineDirectory, 'work')
 try:
     os.mkdir(outDirectoryQC)
+    os.mkdir(workDirectory)
 except FileExistsError:
-    print(f'Directory:\n\t{outDirectoryQC}\nalready exists!')
+    print(f'Directory:\n\t{outDirectoryQC}\nos\n{workDirectory}\nalready exists!')
 sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
-singularityCommand = f'singularity exec {sifFile}'
+singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
 
 
-# for subjID in os.listdir(sourceDirectoryBids):
-#     if subjID in ['participants.tsv', 'dataset_description.json']:
-#         continue
-#    print(subjID)
-#    currBidsDir = os.path.join(sourceDirectoryBids, subjID)
-#print(BIDSValidator().is_bids(currBidsDir))
-qcCommand = f'{singularityCommand} mriqc {sourceDirectoryBids} {outDirectoryQC} participant'
-os.system(qcCommand)
+for subjID in os.listdir(sourceDirectoryBids):
+    if subjID in ['participants.tsv', 'dataset_description.json']:
+        continue
+    print(subjID)
+    subDir = os.path.join(sourceDirectoryBids, subjID)
+    subjectSTR = subjID[4:]
+    for ses in os.listdir(subDir):
+        sessionSTR = ses[4:]
+        qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} -w /work --testing'
+        print(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
+        os.system(qcCommand)
