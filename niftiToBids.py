@@ -116,3 +116,10 @@ for subjID in os.listdir(niftiDirectory):
             print(copyCMD)
             os.system(copyCMD)
         sesN += 1
+
+qcBids = os.path.join(pipelineDirectory, 'qcBIDS')
+try:
+    os.mkdir(qcBids)
+    os.system(f'cp -r {parentBIDS} {qcBids}')
+except Exception as e:
+    print(f'{e}\n\nNot creating qcBIDS directory as it already exists\n')
