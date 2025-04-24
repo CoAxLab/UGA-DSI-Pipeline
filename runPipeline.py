@@ -36,16 +36,16 @@ for subjID in os.listdir(bidsDirectory):
         srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
         fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
-        print(f'\nRunning DSI Studio src standard action for subject: {subjID}.....\n')
+        print(f'\nRunning DSI Studio src standard action for subject: {subjID}, {sesDir}.....\n')
         print(fullCommandStandard)
         os.system(fullCommandStandard)
-        print(f'\n{subjID} standard src exited!\n')
+        print(f'\n{subjID}, {sesDir} standard src exited!\n')
 
         fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
-        print(f'\nRunning DSI Studio src reversed action for subject: {subjID}.....\n')
+        print(f'\nRunning DSI Studio src reversed action for subject: {subjID}, {sesDir}.....\n')
         print(fullCommandReversed)
         os.system(fullCommandReversed)
-        print(f'\n{subjID} reversed src exited!\n')
+        print(f'\n{subjID}, {sesDir} reversed src exited!\n')
 
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 for subSesID in os.listdir(outputDirectorySRC):
@@ -55,7 +55,7 @@ for subSesID in os.listdir(outputDirectorySRC):
     try:
         os.mkdir(recOutDirectory)
     except FileExistsError:
-        print(f'\nrecon action already complete for subject: {subjID}.....\n')
+        print(f'\nrecon action already complete for subject: {subSesID}.....\n')
         continue
         
     for file in os.listdir(srcInputDir):
@@ -73,10 +73,10 @@ for subSesID in os.listdir(outputDirectorySRC):
     reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput} {settings}'
 
     fullRecCommand = f'{singularityCommand} {reconCommand}'
-    print(f'\nRunning DSI Studio recon action for subject: {subjID}.....\n')
+    print(f'\nRunning DSI Studio recon action for subject: {subSesID}.....\n')
     os.chdir(srcInputDir)
     print(fullRecCommand)
     os.system(fullRecCommand)
     end = time.time()
-    print(f'\n{subjID} recon exited in {end - start} seconds!\n')
+    print(f'\n{subSesID} recon exited in {end - start} seconds!\n')
     os.chdir(pipelineDirectory)
