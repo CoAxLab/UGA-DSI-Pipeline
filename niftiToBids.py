@@ -3,6 +3,7 @@ import os
 pipelineDirectory = os.getcwd()
 niftiDirectory = os.path.join(pipelineDirectory, 'convertToBids')
 parentBIDS = os.path.join(pipelineDirectory, 'BIDS')
+lowBFiles = os.path.join(pipelineDirectory, 'lowBFiles')
 setup = False
 try:
     os.mkdir(parentBIDS)
@@ -11,6 +12,7 @@ except Exception as e:
     print(f'\nmoving on...\n')
 descFName = 'dataset_description.json'
 if setup:
+    os.mkdir(lowBFiles)
     os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, descFName)}')
     os.chdir(parentBIDS)
     #os.system('touch dataset_description.json')
@@ -92,10 +94,6 @@ for subjID in os.listdir(niftiDirectory):
         
         #print(os.listdir(currNifti))
         for fileToMove in os.listdir(currNifti):
-            '''change the content of the below statement between passs and continue based on desire for b10 files in output'''
-            if 'b10_' in fileToMove:
-                #continue
-                pass
             # Begin sorting files from nifti directory
             oldFile = os.path.join(currNifti, fileToMove)
             subSesTag = f'sub-{subjID}_ses-{sesN}'
@@ -105,14 +103,18 @@ for subjID in os.listdir(niftiDirectory):
             elif destination == 'dwi':
                 toHere = os.path.join(dwiDir, newFile)
             elif destination == None:
+                print(f'****PIPELINE: No destination for {fileToMove}, doing nothing, and moving on...')
                 continue
-            # match destination:
-            #     case 'anat':
-            #         toHere = os.path.join(anatDir, newFile)
-            #     case 'dwi':
-            #         toHere = os.path.join(dwiDir, newFile)
-            #     case None:
-            #         continue
+
+            '''
+            change the content of the below statement between passs and continue based on desire for b10 files in output
+            '''
+            if 'b10_' in fileToMove:
+                #continue
+                pass
+            '''
+            '''
+
             copyCMD = f'cp {oldFile} {toHere}'
             print(copyCMD)
             os.system(copyCMD)
