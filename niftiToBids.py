@@ -119,28 +119,3 @@ for subjID in os.listdir(niftiDirectory):
             print(copyCMD)
             os.system(copyCMD)
         sesN += 1
-
-qcBids = os.path.join(pipelineDirectory, 'qcBIDS')
-
-os.system(f'cp -r {parentBIDS} {qcBids}')
-
-
-for id in allSubIDs:
-    # attempts to remove lowb files from qcBIDS directory
-    dwiDirS1 = os.path.join(pipelineDirectory, 'qcBIDS', f'sub-{id}', 'ses-1', 'dwi')
-    dwiDirS2 = os.path.join(pipelineDirectory, 'qcBIDS', f'sub-{id}', 'ses-2', 'dwi')
-    if os.path.isdir(dwiDirS1):
-        for f in os.listdir(dwiDirS1):
-            if 'lowb' in f:
-                try:
-                    os.remove(os.path.join(dwiDirS1, f))
-                except Exception as e:
-                    print(e)
-
-    if os.path.isdir(dwiDirS2):
-        for f in os.listdir(dwiDirS2):
-            if 'lowb' in f:
-                try:
-                    os.remove(os.path.join(dwiDirS2, f))
-                except Exception as e:
-                    print(e)
