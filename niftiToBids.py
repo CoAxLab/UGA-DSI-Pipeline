@@ -111,6 +111,7 @@ for subjID in os.listdir(niftiDirectory):
             '''
             if 'b10_' in fileToMove:
                 #continue
+                toHere = toHere.replace('BIDS', 'lowBFiles')
                 pass
             '''
             '''
