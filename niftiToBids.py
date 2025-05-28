@@ -75,22 +75,29 @@ for subjID in os.listdir(niftiDirectory):
     allSubIDs.append(subjID)
     currSubDir = os.path.join(niftiDirectory, subjID)
     outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
+    outTempDir = os.path.join(lowBFiles, f'sub-{subjID}')
     try:
         os.mkdir(outDirectory)
     except Exception as e:
         print(f'{e}\nMoving on from participant {subjID}...')
         continue
+    os.mkdir(outTempDir)
+    print(outTempDir)
 
     sesN = 1
     for sesID in os.listdir(currSubDir):
         currNifti = os.path.join(currSubDir, sesID)
         sesOutDir = os.path.join(outDirectory, f'ses-{sesN}')
+        sesOutTempDir = os.path.join(outTempDir, f'ses-{sesN}')
         os.mkdir(sesOutDir)
+        os.mkdir(sesOutTempDir)
 
         anatDir = os.path.join(sesOutDir, 'anat')
         dwiDir = os.path.join(sesOutDir, 'dwi')
+        dwiTempDir = os.path.join(sesOutTempDir, 'dwi')
         os.mkdir(anatDir)
         os.mkdir(dwiDir)
+        os.mkdir(dwiTempDir)
         
         #print(os.listdir(currNifti))
         for fileToMove in os.listdir(currNifti):
@@ -111,12 +118,12 @@ for subjID in os.listdir(niftiDirectory):
             '''
             if 'b10_' in fileToMove:
                 #continue
-                toHere = toHere.replace('BIDS', 'lowBFiles')
+                toHere = os.path.join(dwiTempDir, newFile)
                 pass
             '''
             '''
 
             copyCMD = f'cp {oldFile} {toHere}'
-            print(copyCMD)
+            #print(copyCMD)
             os.system(copyCMD)
         sesN += 1
