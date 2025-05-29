@@ -2,6 +2,7 @@ import os
 pipelineDirectory = os.getcwd()
 parentBIDS = os.path.join(pipelineDirectory, 'BIDS')
 
+print(f'Moving low-b files. Outputs should all match.')
 for id in os.listdir(parentBIDS):
     subBIDS = os.path.join(parentBIDS, id)
     if os.path.isdir(subBIDS) == False:
