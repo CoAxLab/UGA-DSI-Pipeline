@@ -17,7 +17,11 @@ for subjID in os.listdir(bidsDirectory):
     for sesDir in os.listdir(subBidsPath):
         subSesTag = f'{subjID}_{sesDir}'
         subSesSRCDir = os.path.join(outputDirectorySRC, subSesTag)
-        os.mkdir(subSesSRCDir)
+        try:
+            os.mkdir(subSesSRCDir)
+        except FileExistsError:
+            print(f'\nsrc output folder already created for {subSesTag}...\ncontinuing...\n')
+            continue
         # source files:
         lowStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
         midStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
