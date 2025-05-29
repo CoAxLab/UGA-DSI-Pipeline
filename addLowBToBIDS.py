@@ -11,8 +11,16 @@ for id in os.listdir(parentBIDS):
 
         dwiPath = os.path.join(subBIDS, ses, 'dwi')
         lowBPath = dwiPath.replace('BIDS', 'lowBFiles')
-        if os.path.isdir(lowBPath):
+        if os.listdir(lowBPath) != []: ### if lowBFiles has the files, then move them to BIDS folder
             for f in os.listdir(lowBPath):
                 lowBFile = os.path.join(lowBPath, f)
                 target = os.path.join(dwiPath, f)
                 os.system(f'mv {lowBFile} {target}')
+                print(f'Sub: {id}: Moved file to BIDS/')
+        else: ### lowBFiles does not have the files, move them here
+            for f in os.listdir(dwiPath):
+                if 'lowb' in f:
+                    lowBFile = os.path.join(dwiPath, f)
+                    target = os.path.join(lowBPath, f)
+                    os.system(f'mv {lowBFile} {target}')
+                    print(f'Sub {id}: Moved file to lowBFiles/')
