@@ -11,6 +11,7 @@ except FileExistsError:
 for id in os.listdir(parentBIDS):
     subLow = os.path.join(lowDir, id)
     subBIDS = os.path.join(parentBIDS, id)
+    if os.path.isdir(subBIDS) == False: continue
     os.mkdir(subLow)
     for ses in os.listdir(subBIDS):
         sesLow = os.path.join(subLow, ses)
