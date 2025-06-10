@@ -14,18 +14,20 @@ sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
 singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
 
 
-# for subjID in os.listdir(sourceDirectoryBids):
-#     if subjID in ['participants.tsv', 'dataset_description.json']:
-#         continue
-#     print(subjID)
-#     subDir = os.path.join(sourceDirectoryBids, subjID)
-#     subjectSTR = subjID[4:]
-#     for ses in os.listdir(subDir):
-#         sessionSTR = ses[4:]
-#         qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --nprocs 48 --mem-gb 62 -w /work'
-#         print(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
-#         os.system(qcCommand)
+for subjID in os.listdir(sourceDirectoryBids):
+    if subjID in ['participants.tsv', 'dataset_description.json']:
+        continue
+    print(f'\n\n\n\nsubjID\n\n\n\n')
+    subDir = os.path.join(sourceDirectoryBids, subjID)
+    subjectSTR = subjID[4:]
+    for ses in os.listdir(subDir):
+        print(f'\n\n\n\n{subjID}_{ses}\n\n\n\n')
+        sessionSTR = ses[4:]
+        os.mkdir(os.path.join(workDirectory, f'{subjID}_{ses}'))
+        qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses}'
+        print(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
+        os.system(qcCommand)
 
-QCCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work'
-print(f'-----Running MRIQC for all subjects:\n\t{QCCommand}')
-os.system(QCCommand)
+# QCCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work'
+# print(f'-----Running MRIQC for all subjects:\n\t{QCCommand}')
+# os.system(QCCommand)
