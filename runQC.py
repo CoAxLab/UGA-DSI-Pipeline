@@ -24,7 +24,7 @@ for subjID in os.listdir(sourceDirectoryBids):
         print(f'\n\n\n\n{subjID}_{ses}\n\n\n\n')
         sessionSTR = ses[4:]
         os.mkdir(os.path.join(workDirectory, f'{subjID}_{ses}'))
-        qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses}'
+        qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses} --no-sub'
         print(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
         os.system(qcCommand)
 
