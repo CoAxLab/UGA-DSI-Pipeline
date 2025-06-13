@@ -23,7 +23,7 @@ for subjectSession in os.listdir(fibDirectory):
     
     fullCommand = f'{singularityCommand} {exportCommand}'
     print(f'{fullCommand}')
-    #os.system(fullCommand)
+    os.system(fullCommand)
 
 snrTotals = []
 for sub in os.listdir(qcOutputDirectory):
