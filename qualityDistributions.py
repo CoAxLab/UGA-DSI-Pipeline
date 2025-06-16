@@ -59,6 +59,7 @@ extractedMeasures = {
 }
 
 for sub in os.listdir(qcOutputDirectory):
+    if 'logs' in sub: continue
     currSub = os.path.join(qcOutputDirectory, sub)
     if os.path.isdir(currSub) == False: continue
     for ses in os.listdir(currSub):
