@@ -20,7 +20,11 @@ except Exception as e:
 allFDMeans = []
 for subjectSession in os.listdir(fibDirectory):
     thisdir = os.path.join(fibDirectory, subjectSession)
-    fname = os.listdir(thisdir)[0]
+    try:
+        fname = os.listdir(thisdir)[0]
+    except Exception as e:
+        print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
+        continue
     fibFile = os.path.join(thisdir, fname)
     exportCommand = f'dsi_studio --action=exp --source={fibFile} --export=qa'
     
