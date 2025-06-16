@@ -44,7 +44,16 @@ for subjectSession in os.listdir(fibDirectory):
             print(f'NEEDFIX')
 print(allFDMeans)
 
-snrTotals = []
+extractedMeasures = {
+    'snr_total': [],
+    'snr_csf': [],
+    'snr_gm': [],
+    'qi_2': [],
+    'rpve_gm': [],
+    'rpve_wm': [],
+    'rpve_csf': []
+}
+
 for sub in os.listdir(qcOutputDirectory):
     currSub = os.path.join(qcOutputDirectory, sub)
     if os.path.isdir(currSub) == False: continue
@@ -56,6 +65,10 @@ for sub in os.listdir(qcOutputDirectory):
             jsonPath = os.path.join(currSesAnat, file)
             f = open(jsonPath, 'r')
             metrics = json.load(f)
-            snrTotals.append(metrics["snr_total"])
-plt.hist(snrTotals)
-plt.savefig(os.path.join(figuresOutput, 'snrTotalDistribution.png'))
+            for key in extractedMeasures:
+                extractedMeasures[key].append(metrics[key])
+
+for m in extractedMeasures:
+    plt.hist(extractedMeasures[m])
+    outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
+    plt.savefig(outPath)
