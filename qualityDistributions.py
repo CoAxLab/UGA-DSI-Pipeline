@@ -3,6 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import nibabel as nib
+import seaborn as sns
 
 pipelineDirectory = os.getcwd()
 figuresOutput = os.path.join(pipelineDirectory, 'Figures')
@@ -77,4 +78,6 @@ for m in extractedMeasures:
     plt.figure()
     plt.hist(extractedMeasures[m])
     outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
+    plt.title(m)
+    sns.despine()
     plt.savefig(outPath)
