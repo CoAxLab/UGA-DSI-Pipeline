@@ -62,7 +62,10 @@ if runFunc == True:
                 fdMean = float(qaData)
                 allFDMeans.append(fdMean)
             else:
-                print(f'NEEDFIX')
+                print(f'startHere\n{len(fdMean)}\n')
+                for i in fdMean:
+                    print(i)
+                print(f'endHere\n\n\n')
     print(allFDMeans)
 
 extractedMeasures = {
