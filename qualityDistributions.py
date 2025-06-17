@@ -74,6 +74,7 @@ for sub in os.listdir(qcOutputDirectory):
                 extractedMeasures[key].append(metrics[key])
 
 for m in extractedMeasures:
+    plt.figure()
     plt.hist(extractedMeasures[m])
     outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
     plt.savefig(outPath)
