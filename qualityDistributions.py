@@ -4,6 +4,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import nibabel as nib
 import seaborn as sns
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--dwi', action='store_true', help='flag to only plot distributions for functional file QA values')
+parser.add_argument('-s', '--structural', action='store_true', help='flag to only plot distributions for anatomical file QA values')
+args = parser.parse_args()
+if args.d == args.s:
+    runFunc = True
+    runAnat = True
+else:
+    runFunc = args.d
+    runAnat = args.s
 
 pipelineDirectory = os.getcwd()
 figuresOutput = os.path.join(pipelineDirectory, 'Figures')
