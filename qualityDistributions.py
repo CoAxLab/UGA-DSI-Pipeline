@@ -23,7 +23,7 @@ fibDirectory = os.path.join(pipelineDirectory, 'fib')
 qcOutputDirectory = os.path.join(pipelineDirectory, 'QCOutput')
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
-singularityCommand = f'singularity exec {sifFile}'
+singularityCommand = f'singularity exec -B {fibDirectory}:fib {sifFile}'
 
 try:
     os.mkdir(figuresOutput)
@@ -39,28 +39,29 @@ if runFunc == True:
         except Exception as e:
             print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
             continue
-        inName = fname.replace('.gz', '')
-        fibFile = os.path.join(thisdir, fname, inName)
-        exportCommand = f'dsi_studio --action=exp --source={fibFile} --export=qa'
+        #inName = fname.replace('.gz', '')
+        #fibFile = os.path.join(thisdir, fname, inName)
+        exportCommand = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
         
         fullCommand = f'{singularityCommand} {exportCommand}'
         print(f'{fullCommand}')
         os.system(fullCommand)
 
         for file in os.listdir(thisdir):
-            if 'qa' not in file: continue
-            qaZipPath = os.path.join(thisdir, file)
-            qaFName = os.listdir(qaZipPath)[0]
-            qaFile = os.path.join(qaZipPath, qaFName)
+            pass
+            # if 'qa' not in file: continue
+            # qaZipPath = os.path.join(thisdir, file)
+            # qaFName = os.listdir(qaZipPath)[0]
+            # qaFile = os.path.join(qaZipPath, qaFName)
 
-            object = nib.load(qaFile)
-            qaData = object.get_fdata()
+            # object = nib.load(qaFile)
+            # qaData = object.get_fdata()
 
-            if qaData.size == 1:
-                fdMean = float(qaData)
-                allFDMeans.append(fdMean)
-            else:
-                print(f'NEEDFIX')
+            # if qaData.size == 1:
+            #     fdMean = float(qaData)
+            #     allFDMeans.append(fdMean)
+            # else:
+            #     print(f'NEEDFIX')
     print(allFDMeans)
 
 extractedMeasures = {
