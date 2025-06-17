@@ -23,7 +23,7 @@ fibDirectory = os.path.join(pipelineDirectory, 'fib')
 qcOutputDirectory = os.path.join(pipelineDirectory, 'QCOutput')
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
-singularityCommand = f'singularity exec -B {fibDirectory}:fib {sifFile}'
+singularityCommand = f'singularity exec -B {fibDirectory}:/fib {sifFile}'
 
 try:
     os.mkdir(figuresOutput)
