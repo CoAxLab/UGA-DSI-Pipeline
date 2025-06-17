@@ -41,14 +41,13 @@ if runFunc == True:
             continue
 
         exportCommandQA = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
-        exportCommandFD = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=fd_mean'
+        #exportCommandFD = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=fd_mean'
         
         fullCommandQA = f'{singularityCommand} {exportCommandQA}'
-        fullCommandFD = f'{singularityCommand} {exportCommandFD}'
-        if len(os.listdir(thisdir)) < 3: # if qa file is NOT already extracted
-            for c in [fullCommandFD, fullCommandQA]:
-                print(f'{c}')
-                os.system(c)
+        #fullCommandFD = f'{singularityCommand} {exportCommandFD}'
+        if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
+            print(f'{fullCommandQA}')
+            os.system(fullCommandQA)
         else:
             print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
 
