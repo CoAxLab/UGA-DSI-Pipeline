@@ -10,12 +10,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--dwi', default=False, action='store_true', help='flag to only plot distributions for functional file QA values')
 parser.add_argument('-s', '--structural', default=False, action='store_true', help='flag to only plot distributions for anatomical file QA values')
 args = parser.parse_args()
-if args.d == args.s: # both are specified, or none specified
+if args.dwi == args.structural: # both are specified, or none specified
     runFunc = True
     runAnat = True
 else:
-    runFunc = args.d
-    runAnat = args.s
+    runFunc = args.dwi
+    runAnat = args.structural
 
 pipelineDirectory = os.getcwd()
 figuresOutput = os.path.join(pipelineDirectory, 'Figures')
