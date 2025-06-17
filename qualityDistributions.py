@@ -26,7 +26,8 @@ for subjectSession in os.listdir(fibDirectory):
     except Exception as e:
         print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
         continue
-    fibFile = os.path.join(thisdir, fname)
+    inName = fname.replace('.gz', '')
+    fibFile = os.path.join(thisdir, fname, inName)
     exportCommand = f'dsi_studio --action=exp --source={fibFile} --export=qa'
     
     fullCommand = f'{singularityCommand} {exportCommand}'
