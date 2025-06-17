@@ -40,17 +40,20 @@ if runFunc == True:
             print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
             continue
 
-        exportCommand = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
+        exportCommandQA = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
+        exportCommandFD = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=fd_mean'
         
-        fullCommand = f'{singularityCommand} {exportCommand}'
-        if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
-            print(f'{fullCommand}')
-            os.system(fullCommand)
+        fullCommandQA = f'{singularityCommand} {exportCommandQA}'
+        fullCommandFD = f'{singularityCommand} {exportCommandFD}'
+        if len(os.listdir(thisdir)) < 3: # if qa file is NOT already extracted
+            for c in [fullCommandFD, fullCommandQA]:
+                print(f'{c}')
+                os.system(c)
         else:
             print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
 
         for file in os.listdir(thisdir):
-            if 'qa.nii.gz' not in file: continue
+            if '.nii.gz' not in file: continue
             qaZipPath = os.path.join(thisdir, file)
             #qaFName = os.listdir(qaZipPath)[0]
             #qaFile = os.path.join(qaZipPath, qaFName)
@@ -58,14 +61,7 @@ if runFunc == True:
             object = nib.load(qaZipPath)
             qaData = object.get_fdata()
 
-            if qaData.size == 1:
-                fdMean = float(qaData)
-                allFDMeans.append(fdMean)
-            else:
-                print(f'startHere\n{len(qaData)}\n')
-                for i in qaData:
-                    print(i)
-                print(f'endHere\n\n\n')
+            print(f'number of qa metrics: {qaData.shape[-1]}\n{file}\n')
     print(allFDMeans)
 
 extractedMeasures = {
