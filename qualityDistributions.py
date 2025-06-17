@@ -39,29 +39,30 @@ if runFunc == True:
         except Exception as e:
             print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
             continue
-        #inName = fname.replace('.gz', '')
-        #fibFile = os.path.join(thisdir, fname, inName)
+
         exportCommand = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
         
         fullCommand = f'{singularityCommand} {exportCommand}'
-        print(f'{fullCommand}')
-        os.system(fullCommand)
+        if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
+            print(f'{fullCommand}')
+            os.system(fullCommand)
+        else:
+            print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
 
         for file in os.listdir(thisdir):
-            pass
-            # if 'qa' not in file: continue
-            # qaZipPath = os.path.join(thisdir, file)
-            # qaFName = os.listdir(qaZipPath)[0]
-            # qaFile = os.path.join(qaZipPath, qaFName)
+            if 'qa' not in file: continue
+            qaZipPath = os.path.join(thisdir, file)
+            qaFName = os.listdir(qaZipPath)[0]
+            qaFile = os.path.join(qaZipPath, qaFName)
 
-            # object = nib.load(qaFile)
-            # qaData = object.get_fdata()
+            object = nib.load(qaFile)
+            qaData = object.get_fdata()
 
-            # if qaData.size == 1:
-            #     fdMean = float(qaData)
-            #     allFDMeans.append(fdMean)
-            # else:
-            #     print(f'NEEDFIX')
+            if qaData.size == 1:
+                fdMean = float(qaData)
+                allFDMeans.append(fdMean)
+            else:
+                print(f'NEEDFIX')
     print(allFDMeans)
 
 extractedMeasures = {
