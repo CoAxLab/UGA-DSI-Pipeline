@@ -7,10 +7,10 @@ import seaborn as sns
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--dwi', action='store_true', help='flag to only plot distributions for functional file QA values')
-parser.add_argument('-s', '--structural', action='store_true', help='flag to only plot distributions for anatomical file QA values')
+parser.add_argument('-d', '--dwi', default=False, action='store_true', help='flag to only plot distributions for functional file QA values')
+parser.add_argument('-s', '--structural', default=False, action='store_true', help='flag to only plot distributions for anatomical file QA values')
 args = parser.parse_args()
-if args.d == args.s:
+if args.d == args.s: # both are specified, or none specified
     runFunc = True
     runAnat = True
 else:
