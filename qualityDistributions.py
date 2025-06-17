@@ -50,12 +50,12 @@ if runFunc == True:
             print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
 
         for file in os.listdir(thisdir):
-            if 'qa' not in file: continue
+            if 'qa.nii.gz' not in file: continue
             qaZipPath = os.path.join(thisdir, file)
-            qaFName = os.listdir(qaZipPath)[0]
-            qaFile = os.path.join(qaZipPath, qaFName)
+            #qaFName = os.listdir(qaZipPath)[0]
+            #qaFile = os.path.join(qaZipPath, qaFName)
 
-            object = nib.load(qaFile)
+            object = nib.load(qaZipPath)
             qaData = object.get_fdata()
 
             if qaData.size == 1:
