@@ -61,6 +61,9 @@ if runFunc == True:
             qaData = object.get_fdata()
 
             print(f'number of qa metrics: {qaData.shape[-1]}\n{file}\n')
+            for i in range(len(qaData)):
+                metric = qaData[..., i]
+                print(f'metric {i},\nmean = {metric.mean()},\nrange = [{metric.min()} {metric.max()}]')
     print(allFDMeans)
 
 extractedMeasures = {
