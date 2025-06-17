@@ -30,37 +30,38 @@ try:
 except Exception as e:
     pass
 
-allFDMeans = []
-for subjectSession in os.listdir(fibDirectory):
-    thisdir = os.path.join(fibDirectory, subjectSession)
-    try:
-        fname = os.listdir(thisdir)[0]
-    except Exception as e:
-        print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
-        continue
-    inName = fname.replace('.gz', '')
-    fibFile = os.path.join(thisdir, fname, inName)
-    exportCommand = f'dsi_studio --action=exp --source={fibFile} --export=qa'
-    
-    fullCommand = f'{singularityCommand} {exportCommand}'
-    print(f'{fullCommand}')
-    os.system(fullCommand)
+if runFunc == True:
+    allFDMeans = []
+    for subjectSession in os.listdir(fibDirectory):
+        thisdir = os.path.join(fibDirectory, subjectSession)
+        try:
+            fname = os.listdir(thisdir)[0]
+        except Exception as e:
+            print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
+            continue
+        inName = fname.replace('.gz', '')
+        fibFile = os.path.join(thisdir, fname, inName)
+        exportCommand = f'dsi_studio --action=exp --source={fibFile} --export=qa'
+        
+        fullCommand = f'{singularityCommand} {exportCommand}'
+        print(f'{fullCommand}')
+        os.system(fullCommand)
 
-    for file in os.listdir(thisdir):
-        if 'qa' not in file: continue
-        qaZipPath = os.path.join(thisdir, file)
-        qaFName = os.listdir(qaZipPath)[0]
-        qaFile = os.path.join(qaZipPath, qaFName)
+        for file in os.listdir(thisdir):
+            if 'qa' not in file: continue
+            qaZipPath = os.path.join(thisdir, file)
+            qaFName = os.listdir(qaZipPath)[0]
+            qaFile = os.path.join(qaZipPath, qaFName)
 
-        object = nib.load(qaFile)
-        qaData = object.get_fdata()
+            object = nib.load(qaFile)
+            qaData = object.get_fdata()
 
-        if qaData.size == 1:
-            fdMean = float(qaData)
-            allFDMeans.append(fdMean)
-        else:
-            print(f'NEEDFIX')
-print(allFDMeans)
+            if qaData.size == 1:
+                fdMean = float(qaData)
+                allFDMeans.append(fdMean)
+            else:
+                print(f'NEEDFIX')
+    print(allFDMeans)
 
 extractedMeasures = {
     'snr_total': [],
@@ -72,25 +73,26 @@ extractedMeasures = {
     'rpve_csf': []
 }
 
-for sub in os.listdir(qcOutputDirectory):
-    if 'logs' in sub: continue
-    currSub = os.path.join(qcOutputDirectory, sub)
-    if os.path.isdir(currSub) == False: continue
-    for ses in os.listdir(currSub):
-        if 'figures' in ses: continue
-        currSesAnat = os.path.join(currSub, ses, 'anat')
-        for file in os.listdir(currSesAnat):
-            if '.json' not in file: continue
-            jsonPath = os.path.join(currSesAnat, file)
-            f = open(jsonPath, 'r')
-            metrics = json.load(f)
-            for key in extractedMeasures:
-                extractedMeasures[key].append(metrics[key])
+if runAnat == True:
+    for sub in os.listdir(qcOutputDirectory):
+        if 'logs' in sub: continue
+        currSub = os.path.join(qcOutputDirectory, sub)
+        if os.path.isdir(currSub) == False: continue
+        for ses in os.listdir(currSub):
+            if 'figures' in ses: continue
+            currSesAnat = os.path.join(currSub, ses, 'anat')
+            for file in os.listdir(currSesAnat):
+                if '.json' not in file: continue
+                jsonPath = os.path.join(currSesAnat, file)
+                f = open(jsonPath, 'r')
+                metrics = json.load(f)
+                for key in extractedMeasures:
+                    extractedMeasures[key].append(metrics[key])
 
-for m in extractedMeasures:
-    plt.figure()
-    plt.hist(extractedMeasures[m])
-    outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
-    plt.title(m)
-    sns.despine()
-    plt.savefig(outPath)
+    for m in extractedMeasures:
+        plt.figure()
+        plt.hist(extractedMeasures[m])
+        outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
+        plt.title(m)
+        sns.despine()
+        plt.savefig(outPath)
