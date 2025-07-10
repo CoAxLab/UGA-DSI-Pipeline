@@ -91,6 +91,7 @@ if runAnat == True:
                 f = open(jsonPath, 'r')
                 metrics = json.load(f)
                 for key in extractedMeasures:
+                    if key == 'source_file': continue
                     extractedMeasures[key].append(metrics[key])
 
     exmDF = pd.DataFrame(extractedMeasures)
