@@ -44,11 +44,11 @@ if runFunc == True:
         qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname} --check_rotation --check_snr --check_eddy --check_iso'
         
         fullCommandQC = f'{singularityCommand} {qcCommandPart}'
-        if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
-            print(f'{fullCommandQC}')
-            os.system(fullCommandQC)
-        else:
-            print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
+        #if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
+        print(f'{fullCommandQC}')
+        os.system(fullCommandQC)
+        #else:
+            #print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
         print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
     #     for file in os.listdir(thisdir):
     #         if '.nii.gz' not in file: continue
