@@ -59,8 +59,8 @@ if runFunc == True:
             for r, row in enumerate(tsvObject):
                 if r != 1: continue
                 diffusionMeasures['source_id'].append(subjectSession)
-                diffusionMeasures['coherence_index'].append(row[3])
-                diffusionMeasures['R2_qsdr'].append(row[4])
+                diffusionMeasures['coherence_index'].append(float(row[3]))
+                diffusionMeasures['R2_qsdr'].append(float(row[4]))
 
         print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
 
