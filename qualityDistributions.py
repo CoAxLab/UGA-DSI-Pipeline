@@ -108,7 +108,8 @@ if runAnat == True:
             size = 6
         )
 
-        outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
+        n = len(extractedMeasures[m])
+        outPath = os.path.join(figuresOutput, f'{m}_distribution_n{n}.png')
         plt.title(m)
         sns.despine()
         plt.savefig(outPath)
