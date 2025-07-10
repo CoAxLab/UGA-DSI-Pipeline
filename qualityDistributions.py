@@ -112,4 +112,4 @@ if runAnat == True:
         outPath = os.path.join(figuresOutput, f'{m}_distribution_n{n}.png')
         plt.title(m)
         sns.despine()
-        plt.savefig(outPath)
+        plt.savefig(outPath, bbox_inches = 'tight')
