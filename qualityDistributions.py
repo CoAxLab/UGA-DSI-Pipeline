@@ -50,8 +50,9 @@ if runFunc == True:
         
         fullCommandQC = f'{singularityCommand} {qcCommandPart}'
 
-        print(f'{fullCommandQC}')
-        os.system(fullCommandQC)
+        if os.path.exists(os.path.join(thisdir, 'qc.tsv')) == False:
+            print(f'{fullCommandQC}')
+            os.system(fullCommandQC)
 
         qcFile = os.path.join(thisdir, 'qc.tsv')
         with open(qcFile, newline = '') as file:
