@@ -2,6 +2,7 @@ import os
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import nibabel as nib
 import seaborn as sns
 import argparse
@@ -65,6 +66,7 @@ if runFunc == True:
     # print(allFDMeans)
 
 extractedMeasures = {
+    'source_file': [],
     'snr_total': [],
     'snr_csf': [],
     'snr_gm': [],
@@ -84,28 +86,34 @@ if runAnat == True:
             currSesAnat = os.path.join(currSub, ses, 'anat')
             for file in os.listdir(currSesAnat):
                 if '.json' not in file: continue
+                extractedMeasures['source_file'].append(file)
                 jsonPath = os.path.join(currSesAnat, file)
                 f = open(jsonPath, 'r')
                 metrics = json.load(f)
                 for key in extractedMeasures:
                     extractedMeasures[key].append(metrics[key])
 
+    exmDF = pd.DataFrame(extractedMeasures)
     for m in extractedMeasures:
+        if m == 'source_file': continue
         plt.figure()
 
         sns.catplot(
-            x = extractedMeasures[m],
+            data = exmDF,
+            x = m,
             kind = 'violin',
             inner = 'quart',
             color = "#FBECFD2F"
             )
         
         sns.stripplot(
-            x = extractedMeasures[m],
-            color = "#7D009C",
+            data = exmDF,
+            x = m,
+            #color = "#7D009C",
+            hue = 'source_file',
             edgecolor = "#000000",
             linewidth = 1,
-            size = 6
+            size = 7
         )
 
         n = len(extractedMeasures[m])
