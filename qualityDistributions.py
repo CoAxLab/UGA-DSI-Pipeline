@@ -107,7 +107,7 @@ if runAnat == True:
             color = "#FBECFD2F"
             )
         
-        sns.stripplot(
+        sns.swarmplot(
             data = exmDF,
             x = m,
             #color = "#7D009C",
