@@ -56,9 +56,11 @@ if runFunc == True:
         qcFile = os.path.join(thisdir, 'qc.tsv')
         with open(qcFile, newline = '') as file:
             tsvObject = csv.reader(file, delimiter='\t')
-            diffusionMeasures['source_id'].append(subjectSession)
-            diffusionMeasures['coherence_index'].append(tsvObject[1][3])
-            diffusionMeasures['R2_qsdr'].append(tsvObject[1][4])
+            for r, row in enumerate(tsvObject):
+                if r != 1: continue
+                diffusionMeasures['source_id'].append(subjectSession)
+                diffusionMeasures['coherence_index'].append(row[3])
+                diffusionMeasures['R2_qsdr'].append(row[4])
 
         print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
 
