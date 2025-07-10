@@ -1,9 +1,8 @@
 import os
 import json
+import csv
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import nibabel as nib
 import seaborn as sns
 import argparse
 
@@ -32,7 +31,13 @@ except Exception as e:
     pass
 
 if runFunc == True:
-    allFDMeans = []
+
+    diffusionMeasures = {
+        'source_id': [],
+        'coherence_index': [],
+        'R2_qsdr': []
+    }
+
     for subjectSession in os.listdir(fibDirectory):
         thisdir = os.path.join(fibDirectory, subjectSession)
         try:
@@ -44,39 +49,32 @@ if runFunc == True:
         qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname} --output=/fib/{subjectSession}/qc.tsv'
         
         fullCommandQC = f'{singularityCommand} {qcCommandPart}'
-        #if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
+
         print(f'{fullCommandQC}')
         os.system(fullCommandQC)
-        #else:
-            #print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
+
+        qcFile = os.path.join(thisdir, 'qc.tsv')
+        with open(qcFile, newline = '') as file:
+            tsvObject = csv.reader(file, delimiter='\t')
+            diffusionMeasures['source_id'].append(subjectSession)
+            diffusionMeasures['coherence_index'].append(tsvObject[1][3])
+            diffusionMeasures['R2_qsdr'].append(tsvObject[1][4])
+
         print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
-    #     for file in os.listdir(thisdir):
-    #         if '.nii.gz' not in file: continue
-    #         qaZipPath = os.path.join(thisdir, file)
-    #         #qaFName = os.listdir(qaZipPath)[0]
-    #         #qaFile = os.path.join(qaZipPath, qaFName)
-
-    #         object = nib.load(qaZipPath)
-    #         qaData = object.get_fdata()
-
-    #         print(f'number of qa metrics: {qaData.shape[-1]}\n{file}\n')
-    #         for i in range(len(qaData)):
-    #             metric = qaData[..., i]
-    #             print(f'metric {i},\nmean = {metric.mean()},\nrange = [{metric.min()} {metric.max()}]')
-    # print(allFDMeans)
-
-extractedMeasures = {
-    'source_file': [],
-    'snr_total': [],
-    'snr_csf': [],
-    'snr_gm': [],
-    'qi_2': [],
-    'rpve_gm': [],
-    'rpve_wm': [],
-    'rpve_csf': []
-}
 
 if runAnat == True:
+        
+    extractedMeasures = {
+        'source_file': [],
+        'snr_total': [],
+        'snr_csf': [],
+        'snr_gm': [],
+        'qi_2': [],
+        'rpve_gm': [],
+        'rpve_wm': [],
+        'rpve_csf': []
+    }
+        
     for sub in os.listdir(qcOutputDirectory):
         if 'logs' in sub: continue
         currSub = os.path.join(qcOutputDirectory, sub)
