@@ -37,34 +37,32 @@ if runFunc == True:
         try:
             fname = os.listdir(thisdir)[0]
         except Exception as e:
-            print(f'\n{e}\n\tNothing under {subjectSession}...\n\tContinuing.....')
+            print(f'\n{e}\n\tDirectory Empty For {subjectSession}!!!\n\tContinuing.....')
             continue
 
-        exportCommandQA = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa'
-        #exportCommandFD = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=fd_mean'
+        qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname} --check_rotation --check_snr --check_eddy --check_iso'
         
-        fullCommandQA = f'{singularityCommand} {exportCommandQA}'
-        #fullCommandFD = f'{singularityCommand} {exportCommandFD}'
+        fullCommandQC = f'{singularityCommand} {qcCommandPart}'
         if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
-            print(f'{fullCommandQA}')
-            os.system(fullCommandQA)
+            print(f'{fullCommandQC}')
+            os.system(fullCommandQC)
         else:
             print(f'Looks like qa file for {subjectSession} has already been exported!\nNot running export action...')
+        print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
+    #     for file in os.listdir(thisdir):
+    #         if '.nii.gz' not in file: continue
+    #         qaZipPath = os.path.join(thisdir, file)
+    #         #qaFName = os.listdir(qaZipPath)[0]
+    #         #qaFile = os.path.join(qaZipPath, qaFName)
 
-        for file in os.listdir(thisdir):
-            if '.nii.gz' not in file: continue
-            qaZipPath = os.path.join(thisdir, file)
-            #qaFName = os.listdir(qaZipPath)[0]
-            #qaFile = os.path.join(qaZipPath, qaFName)
+    #         object = nib.load(qaZipPath)
+    #         qaData = object.get_fdata()
 
-            object = nib.load(qaZipPath)
-            qaData = object.get_fdata()
-
-            print(f'number of qa metrics: {qaData.shape[-1]}\n{file}\n')
-            for i in range(len(qaData)):
-                metric = qaData[..., i]
-                print(f'metric {i},\nmean = {metric.mean()},\nrange = [{metric.min()} {metric.max()}]')
-    print(allFDMeans)
+    #         print(f'number of qa metrics: {qaData.shape[-1]}\n{file}\n')
+    #         for i in range(len(qaData)):
+    #             metric = qaData[..., i]
+    #             print(f'metric {i},\nmean = {metric.mean()},\nrange = [{metric.min()} {metric.max()}]')
+    # print(allFDMeans)
 
 extractedMeasures = {
     'snr_total': [],
