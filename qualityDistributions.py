@@ -41,7 +41,7 @@ if runFunc == True:
             print(f'\n{e}\n\tDirectory Empty For {subjectSession}!!!\n\tContinuing.....')
             continue
 
-        qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname} --check_rotation --check_snr --check_eddy --check_iso'
+        qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname}'
         
         fullCommandQC = f'{singularityCommand} {qcCommandPart}'
         #if len(os.listdir(thisdir)) == 1: # if qa file is NOT already extracted
