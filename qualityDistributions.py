@@ -120,5 +120,6 @@ if runAnat == True:
         n = len(extractedMeasures[m])
         outPath = os.path.join(figuresOutput, f'{m}_distribution_n{n}.png')
         plt.title(m)
+        plt.legend().set_visible(False)
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
