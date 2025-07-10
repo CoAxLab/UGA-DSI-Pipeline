@@ -62,6 +62,36 @@ if runFunc == True:
 
         print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
 
+    dwi_exmDF = pd.DataFrame(diffusionMeasures)
+    for m in diffusionMeasures:
+        if m == 'source_id': continue
+        plt.figure()
+
+        sns.catplot(
+            data = dwi_exmDF,
+            x = m,
+            kind = 'violin',
+            inner = 'quart',
+            color = "#ECFDFC2E"
+            )
+        
+        sns.swarmplot(
+            data = dwi_exmDF,
+            x = m,
+            #color = "#7D009C",
+            hue = 'source_id',
+            edgecolor = "#000000",
+            linewidth = 1,
+            size = 7
+        )
+
+        n = len(diffusionMeasures[m])
+        outPath = os.path.join(figuresOutput, f'dwi_{m}_distribution_n{n}.png')
+        plt.title(m)
+        plt.legend().set_visible(False)
+        sns.despine()
+        plt.savefig(outPath, bbox_inches = 'tight')
+
 if runAnat == True:
         
     extractedMeasures = {
