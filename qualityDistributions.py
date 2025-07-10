@@ -94,7 +94,22 @@ if runAnat == True:
 
     for m in extractedMeasures:
         plt.figure()
-        plt.hist(extractedMeasures[m])
+
+        sns.catplot(
+            x = extractedMeasures[m],
+            kind = 'violin',
+            inner = 'quart',
+            color = "#FBECFD2F"
+            )
+        
+        sns.stripplot(
+            x = extractedMeasures[m],
+            color = "#7D009C",
+            edgecolor = "#000000",
+            linewidth = 1,
+            size = 6
+        )
+
         outPath = os.path.join(figuresOutput, f'{m}_distribution.png')
         plt.title(m)
         sns.despine()
