@@ -59,7 +59,7 @@ for subSesID in os.listdir(outputDirectorySRC):
     try:
         os.mkdir(recOutDirectory)
     except FileExistsError:
-        print(f'\nrecon action already complete for subject: {subSesID}.....\n')
+        print(f'\nrecon action already complete for subject (target output folder exists already): {subSesID}.....\n')
         continue
         
     for file in os.listdir(srcInputDir):
@@ -71,10 +71,18 @@ for subSesID in os.listdir(outputDirectorySRC):
     srcFileR = os.path.join(srcInputDir, revFileName)
     fibFileOutput = os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
 
-        
+    # find T1w image
+    tokens = subSesID.split('_')
+    currSub, currSes = tokens[0], tokens[1]
+    currAnatDir = os.path.join(bidsDirectory, currSub, currSes, 'anat')
+    otherImageAddon = ''
+    for anatFile in os.listdir(currAnatDir):
+        if 'T1w' not in anatFile: continue
+        t1wFilePath = os.path.join(currAnatDir, anatFile)
+        otherImageAddon = f' --other_image={t1wFilePath}'
 
     settings = '--method=7 --param0=1.25 --template=0 --qsdr_reso=2.0' # optional settings flags
-    reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput} {settings}'
+    reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput} {settings}{otherImageAddon}'
 
     fullRecCommand = f'{singularityCommand} {reconCommand}'
     print(f'\nRunning DSI Studio recon action for subject: {subSesID}.....\n')
