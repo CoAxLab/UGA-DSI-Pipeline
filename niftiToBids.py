@@ -7,12 +7,12 @@ lowBFiles = os.path.join(pipelineDirectory, 'lowBFiles')
 setup = False
 try:
     os.mkdir(parentBIDS)
+    os.mkdir(lowBFiles)
     setup = True
 except Exception as e:
-    print(f'\nmoving on...\n')
+    print(f'\nmoving on without additional setup steps...\n')
 descFName = 'dataset_description.json'
 if setup:
-    os.mkdir(lowBFiles)
     os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, descFName)}')
     os.chdir(parentBIDS)
     #os.system('touch dataset_description.json')
