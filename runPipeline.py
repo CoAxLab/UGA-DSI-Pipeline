@@ -63,9 +63,9 @@ for subSesID in os.listdir(outputDirectorySRC):
         continue
         
     for file in os.listdir(srcInputDir):
-        if 'rev' in file:
+        if 'rev' in file and '.sz' in file:
             revFileName = file
-        elif 'std' in file:
+        elif '.sz' in file:
             stdFileName = file
     srcFileS = os.path.join(srcInputDir, stdFileName)
     srcFileR = os.path.join(srcInputDir, revFileName)
