@@ -4,6 +4,8 @@ import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import statistics
+from scipy import stats
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -29,6 +31,29 @@ try:
     os.mkdir(figuresOutput)
 except Exception as e:
     pass
+
+
+def hasOutlier(dataList):
+    '''
+    returns tuple: (Bool hasOutlier, Int outlierIndex)
+    '''
+    dataMean = sum(dataList) / len(dataList)
+    dataSD = statistics.stdev(dataList)
+
+    maxDifference = 0
+    index = None
+    for i, val in enumerate(dataList):
+        candidate = abs(val - dataMean)
+        if candidate > maxDifference:
+            maxDifference = candidate
+            index = i
+
+    gStatistic = maxDifference / dataSD
+    a = .05
+    gCritical = stats.t.ppf((1 + (1 - a))/2, len(dataList) - 2)
+
+    return (gStatistic > gCritical, index)
+
 
 if runFunc == True:
 
