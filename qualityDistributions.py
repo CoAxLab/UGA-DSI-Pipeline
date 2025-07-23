@@ -33,7 +33,7 @@ except Exception as e:
     pass
 
 
-def hasOutlier(dataList):
+def hasOutlier(dataList: list) -> tuple:
     '''
     returns tuple: (Bool hasOutlier, Int outlierIndex)
     '''
@@ -55,13 +55,39 @@ def hasOutlier(dataList):
     return (gStatistic > gCritical, index)
 
 
+def makeOutlierLists(dictOfMeasures: dict) -> None:
+    allMeasures = list(dictOfMeasures.keys())
+    for measure in allMeasures:
+        if measure == 'source_id': continue
+        doLoop, location = hasOutlier(dictOfMeasures[measure])
+        flaggedValues = set()
+        listCopy = dictOfMeasures[measure][0:]
+        while doLoop:
+            # only enters if one outlier is found. Will check and remove until none exist
+            flaggedValues.add(listCopy[location])
+            listCopy.pop(location)
+            doLoop, location = hasOutlier(listCopy)
+        
+        outliersList = []
+        for j, value in enumerate(dictOfMeasures[measure]):
+            if value in flaggedValues:
+                outliersList.append(1)
+                print(f'Flagged value: {value}, loc: {j} as outlier for measure: {measure}')
+            else:
+                outliersList.append(0)
+        dictOfMeasures[f'{measure}_Outliers'] = outliersList
+    print(f'Created {len(dictOfMeasures) - len(allMeasures)} new keys')
+    return
+
+
 if runFunc == True:
 
     diffusionMeasures = {
-        'source_id': [],
         'coherence_index': [],
         'R2_qsdr': []
     }
+    namesDiffusion = set(diffusionMeasures.keys())
+    diffusionMeasures['source_id'] = []
 
     for subjectSession in os.listdir(fibDirectory):
         thisdir = os.path.join(fibDirectory, subjectSession)
@@ -88,11 +114,24 @@ if runFunc == True:
                 diffusionMeasures['coherence_index'].append(float(row[3]))
                 diffusionMeasures['R2_qsdr'].append(float(row[4]))
 
-        print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
+        #print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
 
+    # for measure in diffusionMeasures: # loop over diffusion measures
+    #     doLoop, location = hasOutlier(diffusionMeasures[measure])
+    #     flaggedValues = set()
+    #     listCopy = diffusionMeasures[measure][0:]
+    #     while doLoop:
+    #         flaggedValues.add(listCopy[location])
+    #         listCopy.pop(location)
+    #         doLoop, location = hasOutlier(listCopy)
+    #     for j, value in enumerate(diffusionMeasures[measure]):
+    #         if value in flaggedValues:
+    #             diffusionMeasures[f'{measure}_Outlier'][j] = 1
+    #             print(f'Flagged value: {value}, loc: {j} as outlier for measure: {measure}')
+    makeOutlierLists(diffusionMeasures)
     dwi_exmDF = pd.DataFrame(diffusionMeasures)
-    for m in diffusionMeasures:
-        if m == 'source_id': continue
+
+    for m in ['R2_qsdr', 'coherence_index']: # loop over diffusion measures
         plt.figure()
 
         sns.catplot(
@@ -108,6 +147,7 @@ if runFunc == True:
             x = m,
             #color = "#7D009C",
             hue = 'source_id',
+            palette = 'magma',
             edgecolor = "#000000",
             linewidth = 1,
             size = 7
@@ -123,7 +163,6 @@ if runFunc == True:
 if runAnat == True:
         
     extractedMeasures = {
-        'source_file': [],
         'snr_total': [],
         'snr_csf': [],
         'snr_gm': [],
@@ -132,6 +171,8 @@ if runAnat == True:
         'rpve_wm': [],
         'rpve_csf': []
     }
+    namesAnatomical = set(extractedMeasures.keys())
+    extractedMeasures['source_id'] = []
         
     for sub in os.listdir(qcOutputDirectory):
         if 'logs' in sub: continue
@@ -142,17 +183,17 @@ if runAnat == True:
             currSesAnat = os.path.join(currSub, ses, 'anat')
             for file in os.listdir(currSesAnat):
                 if '.json' not in file: continue
-                extractedMeasures['source_file'].append(file)
+                extractedMeasures['source_id'].append(file)
                 jsonPath = os.path.join(currSesAnat, file)
                 f = open(jsonPath, 'r')
                 metrics = json.load(f)
                 for key in extractedMeasures:
-                    if key == 'source_file': continue
+                    if key == 'source_id': continue
                     extractedMeasures[key].append(metrics[key])
 
     exmDF = pd.DataFrame(extractedMeasures)
     for m in extractedMeasures:
-        if m == 'source_file': continue
+        if m == 'source_id': continue
         plt.figure()
 
         sns.catplot(
@@ -167,7 +208,7 @@ if runAnat == True:
             data = exmDF,
             x = m,
             #color = "#7D009C",
-            hue = 'source_file',
+            hue = 'source_id',
             edgecolor = "#000000",
             linewidth = 1,
             size = 7
