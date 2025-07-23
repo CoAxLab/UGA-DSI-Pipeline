@@ -1,13 +1,12 @@
-import os
-import json
-import csv
+import os, json, csv, statistics, argparse
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import statistics
 from scipy import stats
-import argparse
 
+'''
+Handle command line arguments
+'''
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--dwi', action='store_true', help='flag to only plot distributions for functional file QA values')
 parser.add_argument('-s', '--structural', action='store_true', help='flag to only plot distributions for anatomical file QA values')
@@ -19,6 +18,9 @@ else:
     runFunc = args.dwi
     runAnat = args.structural
 
+'''
+Globals and setup
+'''
 pipelineDirectory = os.getcwd()
 figuresOutput = os.path.join(pipelineDirectory, 'Figures')
 fibDirectory = os.path.join(pipelineDirectory, 'fib')
@@ -32,10 +34,14 @@ try:
 except Exception as e:
     pass
 
+'''
+Functions
+'''
 
 def hasOutlier(dataList: list) -> tuple:
     '''
-    returns tuple: (Bool hasOutlier, Int outlierIndex)
+    given a list of numeric data...
+    returns tuple: (Bool: <is there an outlier?>, Int <outlier index>)
     '''
     dataMean = sum(dataList) / len(dataList)
     dataSD = statistics.stdev(dataList)
@@ -56,6 +62,11 @@ def hasOutlier(dataList: list) -> tuple:
 
 
 def makeOutlierLists(dictOfMeasures: dict) -> None:
+    '''
+    give dictionary where keys correspond to lists of numeric data...
+    make a list for each measure, value is 1 if measure has outlier at this index, 0 if not
+    ignores Primary Key ('source_id')
+    '''
     allMeasures = list(dictOfMeasures.keys())
     for measure in allMeasures:
         if measure == 'source_id': continue
@@ -116,22 +127,10 @@ if runFunc == True:
 
         #print(f'\nCOMPLETED {subjectSession}. Moving on...\n\n')
 
-    # for measure in diffusionMeasures: # loop over diffusion measures
-    #     doLoop, location = hasOutlier(diffusionMeasures[measure])
-    #     flaggedValues = set()
-    #     listCopy = diffusionMeasures[measure][0:]
-    #     while doLoop:
-    #         flaggedValues.add(listCopy[location])
-    #         listCopy.pop(location)
-    #         doLoop, location = hasOutlier(listCopy)
-    #     for j, value in enumerate(diffusionMeasures[measure]):
-    #         if value in flaggedValues:
-    #             diffusionMeasures[f'{measure}_Outlier'][j] = 1
-    #             print(f'Flagged value: {value}, loc: {j} as outlier for measure: {measure}')
     makeOutlierLists(diffusionMeasures)
     dwi_exmDF = pd.DataFrame(diffusionMeasures)
 
-    for m in ['R2_qsdr', 'coherence_index']: # loop over diffusion measures
+    for m in namesDiffusion:
         plt.figure()
 
         sns.catplot(
@@ -191,9 +190,10 @@ if runAnat == True:
                     if key == 'source_id': continue
                     extractedMeasures[key].append(metrics[key])
 
+    makeOutlierLists(extractedMeasures)
     exmDF = pd.DataFrame(extractedMeasures)
-    for m in extractedMeasures:
-        if m == 'source_id': continue
+
+    for m in namesAnatomical:
         plt.figure()
 
         sns.catplot(
