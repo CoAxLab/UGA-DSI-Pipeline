@@ -54,11 +54,11 @@ def hasOutlier(dataList: list) -> tuple:
             maxDifference = candidate
             index = i
 
-    gStatistic = maxDifference / dataSD
+    maxZ = maxDifference / dataSD
     a = .05
     gCritical = stats.t.ppf((1 + (1 - a))/2, len(dataList) - 2)
 
-    return (gStatistic > gCritical, index)
+    return (maxZ > gCritical, index)
 
 
 def makeOutlierLists(dictOfMeasures: dict) -> None:
