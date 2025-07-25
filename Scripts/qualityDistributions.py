@@ -129,6 +129,7 @@ if runFunc == True:
 
     makeOutlierLists(diffusionMeasures)
     dwi_exmDF = pd.DataFrame(diffusionMeasures)
+    dwi_exmDF.to_csv(os.path.join(figuresOutput, 'diffusionDF.csv'))
 
     for m in namesDiffusion:
         plt.figure()
@@ -145,7 +146,7 @@ if runFunc == True:
             data = dwi_exmDF,
             x = m,
             #color = "#7D009C",
-            hue = 'source_id',
+            hue = f'{m}_Outliers',
             palette = 'magma',
             edgecolor = "#000000",
             linewidth = 1,
@@ -192,6 +193,7 @@ if runAnat == True:
 
     makeOutlierLists(extractedMeasures)
     exmDF = pd.DataFrame(extractedMeasures)
+    exmDF.to_csv(os.path.join(figuresOutput, 'anatomicalDF.csv'))
 
     for m in namesAnatomical:
         plt.figure()
@@ -208,7 +210,8 @@ if runAnat == True:
             data = exmDF,
             x = m,
             #color = "#7D009C",
-            hue = 'source_id',
+            hue = f'{m}_Outliers',
+            palette= 'magma',
             edgecolor = "#000000",
             linewidth = 1,
             size = 7
