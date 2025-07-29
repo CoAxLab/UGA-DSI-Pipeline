@@ -7,11 +7,11 @@ outDirectoryQC = os.path.join(pipelineDirectory, 'QCOutput')
 workDirectory = os.path.join(pipelineDirectory, 'work')
 
 def RunMRIQC()->None:
-    try:
-        os.mkdir(outDirectoryQC)
-        os.mkdir(workDirectory)
-    except FileExistsError:
-        print(f'Directory:\n\t{outDirectoryQC}\nos\n{workDirectory}\nalready exists!')
+    for needed in [outDirectoryQC, workDirectory]:
+        try:
+            os.mkdir(needed)
+        except FileExistsError:
+            print(f'Directory:\n\t{needed}\nalready exists!')
     sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
     singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
 
