@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
-            "color: #361212;"
+            "color: #642727;"
             "font-weight: bold;"
             )
         self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
