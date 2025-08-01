@@ -1,4 +1,5 @@
 import os
+from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
 niftiDirectory = os.path.join(pipelineDirectory, 'convertToBids')
@@ -59,12 +60,13 @@ def getFileName(file, sub):
 
 def NiftiToBIDS()->None:
     setup = False
-    try:
-        os.mkdir(parentBIDS)
-        os.mkdir(lowBFiles)
-        setup = True
-    except Exception as e:
-        print(f'\nmoving on without additional setup steps...\n')
+    for setupDir in [parentBIDS, lowBFiles]:
+        try:
+            os.mkdir(setupDir)
+            setup = True
+        except Exception as e:
+            pass
+            #print(f'Moving on without additional setup steps...\n')
     descFName = 'dataset_description.json'
     if setup:
         os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, descFName)}')
@@ -80,13 +82,19 @@ def NiftiToBIDS()->None:
         currSubDir = os.path.join(niftiDirectory, subjID)
         outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
         outTempDir = os.path.join(lowBFiles, f'sub-{subjID}')
-        try:
-            os.mkdir(outDirectory)
-        except Exception as e:
-            print(f'{e}\nMoving on from participant {subjID}...')
+        skip = False
+        for d in [outDirectory, outTempDir]:
+            if 'BIDS' in d:
+                messagePart = 'BIDS'
+            elif 'lowB' in d:
+                messagePart = 'lowB'
+            try:
+                os.mkdir(d)
+            except Exception as e:
+                Debug.Log(f'{messagePart} output directories already exist for {subjID}.\nMoving on...')
+                skip = True
+        if skip == True:
             continue
-        os.mkdir(outTempDir)
-        print(outTempDir)
 
         sesN = 1
         for sesID in os.listdir(currSubDir):
@@ -114,7 +122,7 @@ def NiftiToBIDS()->None:
                 elif destination == 'dwi':
                     toHere = os.path.join(dwiDir, newFile)
                 elif destination == None:
-                    print(f'****PIPELINE: No destination for {fileToMove}, doing nothing, and moving on...')
+                    Debug.Log(f'****PIPELINE: No destination for {fileToMove}, doing nothing, and moving on...')
                     continue
 
                 '''
