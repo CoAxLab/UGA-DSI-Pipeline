@@ -1,5 +1,6 @@
 import os
 import time
+from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
@@ -21,8 +22,8 @@ def RunSRC()->None:
             try:
                 os.mkdir(subSesSRCDir)
             except FileExistsError:
-                print(f'\nsrc output folder already created for {subSesTag}...\ncontinuing...\n')
-                continue
+                Debug.Log(f'src output folder already created for {subSesTag}...')
+                #continue
             # source files:
             lowStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-lowb_dwi.nii.gz')
             midStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-midb_dwi.nii.gz')
@@ -41,16 +42,22 @@ def RunSRC()->None:
             srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
             fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
-            print(f'\nRunning DSI Studio src standard action for subject: {subjID}, {sesDir}.....\n')
-            print(fullCommandStandard)
-            os.system(fullCommandStandard)
-            print(f'\n{subjID}, {sesDir} standard src exited!\n')
-
             fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
-            print(f'\nRunning DSI Studio src reversed action for subject: {subjID}, {sesDir}.....\n')
-            print(fullCommandReversed)
-            os.system(fullCommandReversed)
-            print(f'\n{subjID}, {sesDir} reversed src exited!\n')
+            
+            skipThese = set()
+            if os.path.exists(stdOutFile):
+                skipThese.add(fullCommandStandard)
+            if os.path.exists(revOutFile):
+                skipThese.add(fullCommandReversed)
+
+            for fullC in [fullCommandReversed, fullCommandStandard]:
+                if fullC not in skipThese:
+                    Debug.Log(f'\nRunning DSI Studio src action for subject: {subjID}, {sesDir}.....\n')
+                    Debug.Log(fullC)
+                    os.system(fullC)
+                    Debug.Log(f'{subjID}, {sesDir} src exited!')
+                else:
+                    Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
 
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 
@@ -62,17 +69,22 @@ def RunREC()->None:
         try:
             os.mkdir(recOutDirectory)
         except FileExistsError:
-            print(f'\nrecon action already complete for subject (target output folder exists already): {subSesID}.....\n')
-            continue
+            Debug.Log(f'recon action already complete for subject (target output folder exists already): {subSesID}...')
             
         for file in os.listdir(srcInputDir):
             if 'rev' in file and '.sz' in file:
                 revFileName = file
             elif '.sz' in file:
                 stdFileName = file
+        if stdFileName == None and revFileName == None:
+            Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
+            continue
         srcFileS = os.path.join(srcInputDir, stdFileName)
         srcFileR = os.path.join(srcInputDir, revFileName)
         fibFileOutput = os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
+        if os.path.exists(fibFileOutput):
+            Debug.Log(f'fib output exists for {subSesID}. Skipping...')
+            continue
 
         # find T1w image
         tokens = subSesID.split('_')
@@ -83,6 +95,9 @@ def RunREC()->None:
             if 'T1w' not in anatFile: continue
             t1wFilePath = os.path.join(currAnatDir, anatFile)
             otherImageAddon = f' --other_image={t1wFilePath}'
+
+        if otherImageAddon == '':
+            Debug.Log(f' T1w image not found for {subSesID}, running without "--other_image" flag')
 
         settings = '--method=7 --param0=1.25 --template=0 --qsdr_reso=2.0' # optional settings flags
         reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput} {settings}{otherImageAddon}'
