@@ -89,12 +89,26 @@ class MainWindow(QMainWindow):
         self.refreshButton  = QPushButton("Refresh")
         self.refreshButton.clicked.connect(self.activateAll)
         self.refreshButton.setFixedSize(60, 60)
+        toolbar.setStyleSheet("""
+    QToolBar {
+        background: #323D3D;
+        border: 1px solid #555;
+        spacing: 5px;
+    }
+    QPushButton {
+        background: #004242;
+        padding: 5px;
+    }
+    QPushButton:hover {
+        background: #002E2E;
+    }
+""")
         toolbar.addWidget(self.refreshButton)
         
         return
 
     def activateAll(self)->None:
-        Debug.Log(DEBUG, f'Resetting app state')
+        Debug.Log(f'Resetting app state', DEBUG)
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
         layout = QVBoxLayout(centralWidget) # main widget
@@ -116,7 +130,7 @@ class MainWindow(QMainWindow):
             self.setupButton = QPushButton("Pull Singularity images (create or update)")
             self.setupAction = setupPipeline.UpdateImages
         else:
-            Debug.Log(DEBUG, f'Directories have not yet been set up. Doing that now...')
+            Debug.Log(f'Directories have not yet been set up. Doing that now...', DEBUG)
             self.setupButton = QPushButton("Set up directories")
             self.setupAction = setupPipeline.main
         self.setupButton.clicked.connect(self.setupButtonClick)
@@ -152,7 +166,7 @@ class MainWindow(QMainWindow):
         ### end buttons
 
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.createMenuBar()
+        #self.createMenuBar()
         self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
         return None
 
