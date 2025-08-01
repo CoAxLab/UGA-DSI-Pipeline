@@ -112,11 +112,11 @@ class MainWindow(QMainWindow):
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
         layout = QVBoxLayout(centralWidget) # main widget
-
+        "#00FFDD"
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
-            "color: #642727;"
+            "color: #00FFDD;"
             "font-weight: bold;"
             )
 
