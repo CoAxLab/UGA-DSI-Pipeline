@@ -9,11 +9,6 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
-# import Scripts.niftiToBids
-# import Scripts.runPipeline
-# import Scripts.runQC
-# import Scripts.setupPipeline
-
 # Dev Options:
 VERSION = '''
 0.0.2
@@ -104,9 +99,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(centralWidget)
         layout = QVBoxLayout(centralWidget) # main widget
 
-        #vertSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        #layout.addSpacerItem(vertSpacer)
-
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
@@ -116,7 +108,6 @@ class MainWindow(QMainWindow):
 
         # making vertical buttons widget
         vButtons = QVBoxLayout()
-        #vButtons.setAlignment(Qt.AlignmentFlag.AlignCenter)
         vButtons.addWidget(self.label)
 
         ### make setup button
@@ -161,18 +152,9 @@ class MainWindow(QMainWindow):
         ### end buttons
 
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        #self.createMenuBar()
-        #self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
+        self.createMenuBar()
+        self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
         return None
-
-    # def updateTopButtonPosition(self):
-    #     self.topButton.adjustSize()
-    #     self.topButton.move(self.width() - 15 - self.topButton.width(), 150)
-    #     self.topButton.raise_()
-
-    # def resizeEvent(self, a0):
-    #     self.updateTopButtonPosition()
-    #     return super().resizeEvent(a0)
 
     def makeButtonInactive(self, button:QPushButton)->None:
         '''
