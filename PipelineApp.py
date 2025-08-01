@@ -1,16 +1,25 @@
 import sys
 import os
-import Scripts
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QMessageBox
+from Scripts.Util import Debug
+from Scripts import niftiToBids, runPipeline, runQC, setupPipeline
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+    QSpacerItem, QSizePolicy, QToolBar
+    )
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
-import Scripts.niftiToBids
-import Scripts.runPipeline
-import Scripts.runQC
-import Scripts.setupPipeline
+# import Scripts.niftiToBids
+# import Scripts.runPipeline
+# import Scripts.runQC
+# import Scripts.setupPipeline
 
-VERSION = '''0.0.1'''
+# Dev Options:
+VERSION = '''
+0.0.2
+'''
+DEBUG = True
+# End Dev Options
 
 # class DSIButton():
 #     def __init__(self, qButton: QPushButton, name: str, action: function):
@@ -28,64 +37,15 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"DSI Studio Pipeline")
-        self.Xstart = 300
-        self.WIDTH = 1200
-        self.Ystart = 200
-        self.HEIGHT = 600
+        self.Xstart = 150
+        self.WIDTH = 1500
+        self.Ystart = 100
+        self.HEIGHT = 750
         self.setGeometry(self.Xstart, self.Ystart, self.WIDTH, self.HEIGHT)
-
-        centralWidget = QWidget()
-        self.setCentralWidget(centralWidget)
-        layout = QVBoxLayout(centralWidget)
-
-        self.label = QLabel("Welcome!", self)
-        self.label.setFont(QFont("Serif", 20))
-        self.label.setStyleSheet(
-            "color: #642727;"
-            "font-weight: bold;"
-            )
-        self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        layout.addWidget(self.label)
-
-        ### make setup button
-        if os.path.isdir('convertToBids'):
-            # only refresh images if directory setup already is complete
-            self.setupButton = QPushButton("Pull Singularity images (create or update)")
-            self.setupAction = Scripts.setupPipeline.UpdateImages
-        else:
-            self.setupButton = QPushButton("Set up directories")
-            self.setupAction = Scripts.setupPipeline.main
-        self.setupButton.clicked.connect(self.setupButtonClick)
-        self.setupButton.setFixedSize(650, 50)
-        layout.addWidget(self.setupButton)
-
-        ### make nifti button
-        self.niftiButton = QPushButton("Move nifti files to BIDS directory")
-        self.niftiButton.clicked.connect(self.niftiButtonClick)
-        self.niftiButton.setFixedSize(650, 50)
-        layout.addWidget(self.niftiButton)
-
-        ### make mriqc button
-        self.mriqcButton = QPushButton("Run MRIQC for anatomical data")
-        self.mriqcButton.clicked.connect(self.mriqcButtonClick)
-        self.mriqcButton.setFixedSize(650, 50)
-        layout.addWidget(self.mriqcButton)
-
-        ### make src button
-        self.srcButton = QPushButton("Run DSI Studio src action for diffusion data")
-        self.srcButton.clicked.connect(self.srcButtonClick)
-        self.srcButton.setFixedSize(650, 50)
-        layout.addWidget(self.srcButton)
-
-        ### make rec button
-        self.recButton = QPushButton("Run DSI Studio rec action for diffusion data")
-        self.recButton.clicked.connect(self.recButtonClick)
-        self.recButton.setFixedSize(650, 50)
-        layout.addWidget(self.recButton)
-        ### end buttons
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.createMenuBar()
-        self.statusBar().showMessage(f"Running DSI Studio Pipeline and Visualizer App Version: {VERSION}")
+    
+        self.makeToolbar() # makes toolbar at top of screen
+        self.activateAll() # makes central widget, status and buttons
+        
     ### END __init__()
 
     def setupButtonClick(self)->None:
@@ -96,27 +56,123 @@ class MainWindow(QMainWindow):
     
     def niftiButtonClick(self)->None:
         self.label.setText("Moving nifti files to BIDS format...")
-        Scripts.niftiToBids.NiftiToBIDS()
+        niftiToBids.NiftiToBIDS()
         self.label.setText("BIDS re-format complete!")
         self.makeButtonInactive(self.niftiButton)
 
     def mriqcButtonClick(self)->None:
         self.label.setText("Running MRIQC...")
-        Scripts.runQC.RunMRIQC()
+        runQC.RunMRIQC()
         self.label.setText("MRIQC Complete!")
         self.makeButtonInactive(self.mriqcButton)
 
     def srcButtonClick(self)->None:
         self.label.setText("Running SRC action")
-        Scripts.runPipeline.RunSRC()
+        runPipeline.RunSRC()
         self.label.setText("SRC Complete!")
         self.makeButtonInactive(self.srcButton)
+        return
 
     def recButtonClick(self)->None:
         self.label.setText("Running REC action")
-        Scripts.runPipeline.RunREC()
+        runPipeline.RunREC()
         self.label.setText("REC Complete!")
         self.makeButtonInactive(self.recButton)
+        return
+
+    def makeToolbar(self)->None:
+        # making toolbar widget
+        toolbar = QToolBar("ToolBox")
+        toolbar.setMovable(False)
+        self.addToolBar(Qt.ToolBarArea.TopToolBarArea, toolbar)
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        toolbar.addWidget(spacer)
+
+        # buttons
+        self.refreshButton  = QPushButton("Refresh")
+        self.refreshButton.clicked.connect(self.activateAll)
+        self.refreshButton.setFixedSize(60, 60)
+        toolbar.addWidget(self.refreshButton)
+        
+        return
+
+    def activateAll(self)->None:
+        Debug.Log(DEBUG, f'Resetting app state')
+        centralWidget = QWidget()
+        self.setCentralWidget(centralWidget)
+        layout = QVBoxLayout(centralWidget) # main widget
+
+        #vertSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        #layout.addSpacerItem(vertSpacer)
+
+        self.label = QLabel("Welcome!", self)
+        self.label.setFont(QFont("Serif", 20))
+        self.label.setStyleSheet(
+            "color: #642727;"
+            "font-weight: bold;"
+            )
+
+        # making vertical buttons widget
+        vButtons = QVBoxLayout()
+        #vButtons.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        vButtons.addWidget(self.label)
+
+        ### make setup button
+        if os.path.isdir('convertToBids'):
+            # only refresh images if directory setup already is complete
+            self.setupButton = QPushButton("Pull Singularity images (create or update)")
+            self.setupAction = setupPipeline.UpdateImages
+        else:
+            Debug.Log(DEBUG, f'Directories have not yet been set up. Doing that now...')
+            self.setupButton = QPushButton("Set up directories")
+            self.setupAction = setupPipeline.main
+        self.setupButton.clicked.connect(self.setupButtonClick)
+        self.setupButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+        vButtons.addWidget(self.setupButton)
+
+        ### make nifti button
+        self.niftiButton = QPushButton("Move nifti files to BIDS directory")
+        self.niftiButton.clicked.connect(self.niftiButtonClick)
+        self.niftiButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+        vButtons.addWidget(self.niftiButton)
+
+        ### make mriqc button
+        self.mriqcButton = QPushButton("Run MRIQC for anatomical data")
+        self.mriqcButton.clicked.connect(self.mriqcButtonClick)
+        self.mriqcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+        vButtons.addWidget(self.mriqcButton)
+
+        ### make src button
+        self.srcButton = QPushButton("Run DSI Studio src action for diffusion data")
+        self.srcButton.clicked.connect(self.srcButtonClick)
+        self.srcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+        vButtons.addWidget(self.srcButton)
+
+        ### make rec button
+        self.recButton = QPushButton("Run DSI Studio rec action for diffusion data")
+        self.recButton.clicked.connect(self.recButtonClick)
+        self.recButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+        vButtons.addWidget(self.recButton)
+
+        layout.addLayout(vButtons)
+        
+        ### end buttons
+
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        #self.createMenuBar()
+        #self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
+        return None
+
+    # def updateTopButtonPosition(self):
+    #     self.topButton.adjustSize()
+    #     self.topButton.move(self.width() - 15 - self.topButton.width(), 150)
+    #     self.topButton.raise_()
+
+    # def resizeEvent(self, a0):
+    #     self.updateTopButtonPosition()
+    #     return super().resizeEvent(a0)
 
     def makeButtonInactive(self, button:QPushButton)->None:
         '''
@@ -134,7 +190,6 @@ class MainWindow(QMainWindow):
 
         exitAction = fileMenu.addAction("Exit")
         exitAction.triggered.connect(self.close)
-        
 
 
 def main():
