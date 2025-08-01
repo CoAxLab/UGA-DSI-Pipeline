@@ -70,7 +70,8 @@ def RunREC()->None:
             os.mkdir(recOutDirectory)
         except FileExistsError:
             Debug.Log(f'recon action already complete for subject (target output folder exists already): {subSesID}...')
-            
+        
+        stdFileName, revFileName = None, None
         for file in os.listdir(srcInputDir):
             if 'rev' in file and '.sz' in file:
                 revFileName = file
