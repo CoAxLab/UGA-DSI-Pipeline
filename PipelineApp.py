@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
     def refreshAll(self)->None:
         for b in [self.setupButton, self.niftiButton, self.mriqcButton, self.srcButton, self.recButton]:
             b.setDisabled(False)
+            b.setToolTip(None)
         self.label.setText('All buttons are reset.')
         return
 
