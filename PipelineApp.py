@@ -1,7 +1,7 @@
 import sys
 import os
 from Scripts.Util import Debug
-from Scripts import niftiToBids, runPipeline, runQC, setupPipeline
+from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
     QSpacerItem, QSizePolicy, QToolBar
@@ -11,7 +11,7 @@ from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.0.2
+0.0.3
 '''
 DEBUG = True
 # End Dev Options
@@ -41,6 +41,8 @@ class MainWindow(QMainWindow):
         self.makeToolbar() # makes toolbar at top of screen
         self.activateAll() # makes central widget, status and buttons
         
+        for button in self.findChildren(QPushButton):
+            button.clicked.connect(self.updateStatus)
     ### END __init__()
 
     def setupButtonClick(self)->None:
@@ -74,6 +76,21 @@ class MainWindow(QMainWindow):
         self.label.setText("REC Complete!")
         self.makeButtonInactive(self.recButton)
         return
+    
+    def refreshAll(self)->None:
+        for b in [self.setupButton, self.niftiButton, self.mriqcButton, self.srcButton, self.recButton]:
+            b.setDisabled(False)
+        self.label.setText('All buttons are reset.')
+        return
+
+    def flipLowB(self)->None:
+        result = addLowBToBIDS.FlipLOWBLocation()
+        self.label.setText(result)
+        return
+    
+    def updateStatus(self)->None:
+
+        Debug.Log(f'Function not added', DEBUG)
 
     def makeToolbar(self)->None:
         # making toolbar widget
@@ -87,22 +104,28 @@ class MainWindow(QMainWindow):
 
         # buttons
         self.refreshButton  = QPushButton("Refresh")
-        self.refreshButton.clicked.connect(self.activateAll)
-        self.refreshButton.setFixedSize(60, 60)
+        self.refreshButton.clicked.connect(self.refreshAll)
+        self.refreshButton.setFixedSize(55, 45)
+
+        self.flipLowBButton = QPushButton("Flip\nLow B")
+        self.flipLowBButton.clicked.connect(self.flipLowB)
+        self.flipLowBButton.setFixedSize(65, 45)
+
         toolbar.setStyleSheet("""
-    QToolBar {
-        background: #323D3D;
-        border: 1px solid #555;
-        spacing: 5px;
-    }
-    QPushButton {
-        background: #004242;
-        padding: 5px;
-    }
-    QPushButton:hover {
-        background: #002E2E;
-    }
-""")
+        QToolBar {
+            background: #323D3D;
+            border: 1px solid #555;
+            spacing: 5px;
+            }
+        QPushButton {
+            background: #004242;
+            padding: 5px;
+            }
+        QPushButton:hover {
+            background: #002E2E;
+            }
+        """)
+        toolbar.addWidget(self.flipLowBButton)
         toolbar.addWidget(self.refreshButton)
         
         return
@@ -112,7 +135,6 @@ class MainWindow(QMainWindow):
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
         layout = QVBoxLayout(centralWidget) # main widget
-        "#00FFDD"
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
@@ -168,6 +190,7 @@ class MainWindow(QMainWindow):
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         #self.createMenuBar()
         self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
+        print(len(self.findChildren(QPushButton)))
         return None
 
     def makeButtonInactive(self, button:QPushButton)->None:
