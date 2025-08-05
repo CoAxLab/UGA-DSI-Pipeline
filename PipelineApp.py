@@ -1,10 +1,10 @@
 import sys
 import os
-from Scripts.Util import Debug
+from Scripts.Util import Debug, StatusChecker
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QSpacerItem, QSizePolicy, QToolBar
+    QSizePolicy, QToolBar, QTextEdit
     )
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
@@ -28,6 +28,7 @@ DEBUG = True
 
 
 class MainWindow(QMainWindow):
+    actionButtons:list[QPushButton] = []
 
     def __init__(self):
         super().__init__()
@@ -52,33 +53,81 @@ class MainWindow(QMainWindow):
         self.makeButtonInactive(self.setupButton)
     
     def niftiButtonClick(self)->None:
+        self.execButton.clicked.disconnect()
+        self.execButton.clicked.connect(self.niftiExecute)
+        self.displayRegion.clear()
+        self.displayRegion.append("SELECTED NIFTI TO BIDS\n")
+        self.displayRegion.append("The following ID's will be converted to BIDS format:")
+        source, ids, target = StatusChecker.niftiStatus()
+        
+        Debug.Log(StatusChecker.niftiStatus())
+        for id in ids:
+            self.displayRegion.append(id)
+    def niftiExecute(self)->None:
         self.label.setText("Moving nifti files to BIDS format...")
         niftiToBids.NiftiToBIDS()
         self.label.setText("BIDS re-format complete!")
         self.makeButtonInactive(self.niftiButton)
+        #self.execButton.clicked.disconnect()
 
     def mriqcButtonClick(self)->None:
+        self.execButton.clicked.disconnect()
+        self.execButton.clicked.connect(self.mriqcButtonExecute)
+        self.displayRegion.clear()
+        self.displayRegion.append("SELECTED MRIQC\n")
+        self.displayRegion.append("The following ID's will be evaluated by MRIQC:")
+        source, ids, target = StatusChecker.qcStatus()
+        
+        Debug.Log(StatusChecker.qcStatus())
+        for id in ids:
+            self.displayRegion.append(id)
+    def mriqcButtonExecute(self)->None:
         self.label.setText("Running MRIQC...")
         runQC.RunMRIQC()
         self.label.setText("MRIQC Complete!")
         self.makeButtonInactive(self.mriqcButton)
+        #self.execButton.clicked.disconnect()
 
     def srcButtonClick(self)->None:
+        self.execButton.clicked.disconnect()
+        self.execButton.clicked.connect(self.srcButtonExecute)
+        self.displayRegion.clear()
+        self.displayRegion.append("SELECTED SRC\n")
+        self.displayRegion.append("The following ID's will go through Dsi Studio's SRC action:")
+        source, ids, target = StatusChecker.srcStatus()
+        
+        Debug.Log(StatusChecker.srcStatus())
+        for id in ids:
+            self.displayRegion.append(id)
+    def srcButtonExecute(self)->None:
         self.label.setText("Running SRC action")
         runPipeline.RunSRC()
         self.label.setText("SRC Complete!")
         self.makeButtonInactive(self.srcButton)
+        #self.execButton.clicked.disconnect()
         return
 
     def recButtonClick(self)->None:
+        self.execButton.clicked.disconnect()
+        self.execButton.clicked.connect(self.recButtonExecute)
+        self.displayRegion.clear()
+        self.displayRegion.append("SELECTED REC\n")
+        self.displayRegion.append("The following ID's will go through Dsi Studio's REC action:")
+        source, ids, target = StatusChecker.recStatus()
+        
+        Debug.Log(StatusChecker.recStatus())
+        for id in ids:
+            self.displayRegion.append(id)
+    def recButtonExecute(self)->None:
         self.label.setText("Running REC action")
         runPipeline.RunREC()
         self.label.setText("REC Complete!")
         self.makeButtonInactive(self.recButton)
+        #self.execButton.clicked.disconnect()
         return
     
     def refreshAll(self)->None:
-        for b in [self.setupButton, self.niftiButton, self.mriqcButton, self.srcButton, self.recButton]:
+        for b in self.actionButtons:
             b.setDisabled(False)
             b.setToolTip(None)
         self.label.setText('All buttons are reset.')
@@ -88,6 +137,20 @@ class MainWindow(QMainWindow):
         result = addLowBToBIDS.FlipLOWBLocation()
         self.label.setText(result)
         return
+    
+    def timeOutButtons(self)->list:
+        timedOut = []
+        for button in self.actionButtons:
+            if button.isEnabled():
+                timedOut.append(button)
+                button.setDisabled(True)
+                button.setToolTip('Action in progress, please wait.')
+        return timedOut
+    
+    def restoreTimedOutButtons(self, timedOut:list[QPushButton])->None:
+        for button in timedOut:
+            button.setDisabled(False)
+            button.setToolTip(None)
     
     def updateStatus(self)->None:
 
@@ -135,7 +198,7 @@ class MainWindow(QMainWindow):
         Debug.Log(f'Resetting app state', DEBUG)
         centralWidget = QWidget()
         self.setCentralWidget(centralWidget)
-        layout = QVBoxLayout(centralWidget) # main widget
+        layout = QHBoxLayout(centralWidget) # main layout
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
@@ -159,39 +222,69 @@ class MainWindow(QMainWindow):
         self.setupButton.clicked.connect(self.setupButtonClick)
         self.setupButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
         vButtons.addWidget(self.setupButton)
+        self.actionButtons.append(self.setupButton)
 
         ### make nifti button
         self.niftiButton = QPushButton("Move nifti files to BIDS directory")
         self.niftiButton.clicked.connect(self.niftiButtonClick)
         self.niftiButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
         vButtons.addWidget(self.niftiButton)
+        self.actionButtons.append(self.niftiButton)
 
         ### make mriqc button
         self.mriqcButton = QPushButton("Run MRIQC for anatomical data")
         self.mriqcButton.clicked.connect(self.mriqcButtonClick)
         self.mriqcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
         vButtons.addWidget(self.mriqcButton)
+        self.actionButtons.append(self.mriqcButton)
 
         ### make src button
         self.srcButton = QPushButton("Run DSI Studio src action for diffusion data")
         self.srcButton.clicked.connect(self.srcButtonClick)
         self.srcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
         vButtons.addWidget(self.srcButton)
+        self.actionButtons.append(self.srcButton)
 
         ### make rec button
         self.recButton = QPushButton("Run DSI Studio rec action for diffusion data")
         self.recButton.clicked.connect(self.recButtonClick)
         self.recButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
         vButtons.addWidget(self.recButton)
+        self.actionButtons.append(self.recButton)
 
-        layout.addLayout(vButtons)
+        ### make run button
+        self.execButton = QPushButton("Execute Selected")
+        self.execButton.clicked.connect(self.updateStatus)
+        self.execButton.setFixedSize(int(.25*self.width()), int(.125*self.height()))
+        self.execButton.setObjectName("ExecButton")
+        execButtonStyle = """
+            #ExecButton {
+                background-color: #1D5357;
+                border: none;
+                color: white;
+                border-radius: 5px;
+                padding: 10px 20px;
+            }
+            #ExecButton:hover {
+                background-color: #3CA9B1;
+            }
+        """
+        "#3CA9B1"
+        self.execButton.setStyleSheet(execButtonStyle)
+        vButtons.addWidget(self.execButton, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+        self.displayRegion = QTextEdit()
+        self.displayRegion.setReadOnly(True)
+
+        layout.addLayout(vButtons, stretch=2)
+        layout.addWidget(self.displayRegion, stretch=1)
         
         ### end buttons
 
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        vButtons.setAlignment(Qt.AlignmentFlag.AlignCenter)
         #self.createMenuBar()
         self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
-        print(len(self.findChildren(QPushButton)))
+        Debug.Log(len(self.findChildren(QPushButton)), DEBUG)
         return None
 
     def makeButtonInactive(self, button:QPushButton)->None:
