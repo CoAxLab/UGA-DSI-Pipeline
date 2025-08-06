@@ -4,7 +4,7 @@ from Scripts.Util import Debug, StatusChecker
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QSizePolicy, QToolBar, QTextEdit
+    QSizePolicy, QToolBar, QTextEdit, QStackedWidget
     )
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
@@ -40,10 +40,22 @@ class MainWindow(QMainWindow):
         self.setGeometry(self.Xstart, self.Ystart, self.WIDTH, self.HEIGHT)
     
         self.makeToolbar() # makes toolbar at top of screen
-        self.activateAll() # makes central widget, status and buttons
-        
-        for button in self.findChildren(QPushButton):
-            button.clicked.connect(self.updateStatus)
+        self.centralStack = QStackedWidget()
+        self.setCentralWidget(self.centralStack)
+        self.centralStack.addWidget(self.MakeFunctionalWidget()) # makes central widget, status and buttons
+        "#617977"
+        for button in self.actionButtons:
+            #button.clicked.connect(self.updateStatus)
+            button.setProperty("class", 'functionalButton')
+
+        self.setStyleSheet('''
+                            QPushButton[class="functionalButton"]:disabled {
+                                background: #617977;
+                            }
+                            QPushButton[class="functionalButton"]:hover {
+                                background: #002E2E
+                            }
+                           ''')
     ### END __init__()
 
     def setupButtonClick(self)->None:
@@ -53,7 +65,7 @@ class MainWindow(QMainWindow):
         self.makeButtonInactive(self.setupButton)
     
     def niftiButtonClick(self)->None:
-        self.execButton.clicked.disconnect()
+        self.clearExecute()
         self.execButton.clicked.connect(self.niftiExecute)
         self.displayRegion.clear()
         self.displayRegion.append("SELECTED NIFTI TO BIDS\n")
@@ -65,13 +77,15 @@ class MainWindow(QMainWindow):
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
         self.label.setText("Moving nifti files to BIDS format...")
+        restoreThese = self.timeOutButtons()
         niftiToBids.NiftiToBIDS()
         self.label.setText("BIDS re-format complete!")
+        self.restoreTimedOutButtons(restoreThese)
         self.makeButtonInactive(self.niftiButton)
         #self.execButton.clicked.disconnect()
 
     def mriqcButtonClick(self)->None:
-        self.execButton.clicked.disconnect()
+        self.clearExecute()
         self.execButton.clicked.connect(self.mriqcButtonExecute)
         self.displayRegion.clear()
         self.displayRegion.append("SELECTED MRIQC\n")
@@ -83,13 +97,15 @@ class MainWindow(QMainWindow):
             self.displayRegion.append(id)
     def mriqcButtonExecute(self)->None:
         self.label.setText("Running MRIQC...")
+        restoreThese = self.timeOutButtons()
         runQC.RunMRIQC()
         self.label.setText("MRIQC Complete!")
+        self.restoreTimedOutButtons(restoreThese)
         self.makeButtonInactive(self.mriqcButton)
         #self.execButton.clicked.disconnect()
 
     def srcButtonClick(self)->None:
-        self.execButton.clicked.disconnect()
+        self.clearExecute()
         self.execButton.clicked.connect(self.srcButtonExecute)
         self.displayRegion.clear()
         self.displayRegion.append("SELECTED SRC\n")
@@ -101,14 +117,16 @@ class MainWindow(QMainWindow):
             self.displayRegion.append(id)
     def srcButtonExecute(self)->None:
         self.label.setText("Running SRC action")
+        restoreThese = self.timeOutButtons()
         runPipeline.RunSRC()
         self.label.setText("SRC Complete!")
+        self.restoreTimedOutButtons(restoreThese)
         self.makeButtonInactive(self.srcButton)
         #self.execButton.clicked.disconnect()
         return
 
     def recButtonClick(self)->None:
-        self.execButton.clicked.disconnect()
+        self.clearExecute()
         self.execButton.clicked.connect(self.recButtonExecute)
         self.displayRegion.clear()
         self.displayRegion.append("SELECTED REC\n")
@@ -120,17 +138,27 @@ class MainWindow(QMainWindow):
             self.displayRegion.append(id)
     def recButtonExecute(self)->None:
         self.label.setText("Running REC action")
+        restoreThese = self.timeOutButtons()
         runPipeline.RunREC()
         self.label.setText("REC Complete!")
+        self.restoreTimedOutButtons(restoreThese)
         self.makeButtonInactive(self.recButton)
-        #self.execButton.clicked.disconnect()
         return
+    
+    def clearExecute(self)->None:
+        '''Disconnects Execute Button from any click signals, if connected.'''
+        try:
+            self.execButton.disconnect()
+        except Exception as e:
+            Debug.Log(f'{e}\n\tAttempet to disconnect execute button.', DEBUG)
     
     def refreshAll(self)->None:
         for b in self.actionButtons:
             b.setDisabled(False)
             b.setToolTip(None)
+        self.clearExecute()
         self.label.setText('All buttons are reset.')
+        self.displayRegion.clear()
         return
 
     def flipLowB(self)->None:
@@ -142,6 +170,7 @@ class MainWindow(QMainWindow):
         timedOut = []
         for button in self.actionButtons:
             if button.isEnabled():
+                #Debug.Log(f'Timeout', DEBUG)
                 timedOut.append(button)
                 button.setDisabled(True)
                 button.setToolTip('Action in progress, please wait.')
@@ -149,6 +178,7 @@ class MainWindow(QMainWindow):
     
     def restoreTimedOutButtons(self, timedOut:list[QPushButton])->None:
         for button in timedOut:
+            #Debug.Log(f'Restore', DEBUG)
             button.setDisabled(False)
             button.setToolTip(None)
     
@@ -194,11 +224,10 @@ class MainWindow(QMainWindow):
         
         return
 
-    def activateAll(self)->None:
-        Debug.Log(f'Resetting app state', DEBUG)
-        centralWidget = QWidget()
-        self.setCentralWidget(centralWidget)
-        layout = QHBoxLayout(centralWidget) # main layout
+    def MakeFunctionalWidget(self)->QWidget:
+        centralWidgetFunctions = QWidget()
+        #self.setCentralWidget(centralWidgetFunctions)
+        layout = QHBoxLayout(centralWidgetFunctions) # main layout
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
@@ -254,7 +283,7 @@ class MainWindow(QMainWindow):
 
         ### make run button
         self.execButton = QPushButton("Execute Selected")
-        self.execButton.clicked.connect(self.updateStatus)
+        #self.execButton.clicked.connect(self.updateStatus)
         self.execButton.setFixedSize(int(.25*self.width()), int(.125*self.height()))
         self.execButton.setObjectName("ExecButton")
         execButtonStyle = """
@@ -285,7 +314,7 @@ class MainWindow(QMainWindow):
         #self.createMenuBar()
         self.statusBar().showMessage(f"Running DSI Studio Pipeline Interface App Version: {VERSION}")
         Debug.Log(len(self.findChildren(QPushButton)), DEBUG)
-        return None
+        return centralWidgetFunctions
 
     def makeButtonInactive(self, button:QPushButton)->None:
         '''
