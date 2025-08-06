@@ -5,20 +5,6 @@ import seaborn as sns
 from scipy import stats
 
 '''
-Handle command line arguments
-'''
-parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--dwi', action='store_true', help='flag to only plot distributions for functional file QA values')
-parser.add_argument('-s', '--structural', action='store_true', help='flag to only plot distributions for anatomical file QA values')
-args = parser.parse_args()
-if args.dwi == args.structural: # both are specified, or none specified
-    runFunc = True
-    runAnat = True
-else:
-    runFunc = args.dwi
-    runAnat = args.structural
-
-'''
 Globals and setup
 '''
 pipelineDirectory = os.getcwd()
@@ -225,6 +211,20 @@ def RunAnatomical()->None:
         plt.savefig(outPath, bbox_inches = 'tight')
 
 def main()->None:
+    '''
+    Handle command line arguments
+    '''
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--dwi', action='store_true', help='flag to only plot distributions for functional file QA values')
+    parser.add_argument('-s', '--structural', action='store_true', help='flag to only plot distributions for anatomical file QA values')
+    args = parser.parse_args()
+    if args.dwi == args.structural: # both are specified, or none specified
+        runFunc = True
+        runAnat = True
+    else:
+        runFunc = args.dwi
+        runAnat = args.structural
+
     if runFunc:
         RunFunctional()
     if runAnat:
