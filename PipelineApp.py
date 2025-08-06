@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         self.centralStack = QStackedWidget()
         self.setCentralWidget(self.centralStack)
         self.centralStack.addWidget(self.MakeFunctionalWidget()) # makes central widget, status and buttons
+        self.centralStack.addWidget(self.MakeVisualisationWidget())
         "#617977"
         for button in self.actionButtons:
             #button.clicked.connect(self.updateStatus)
@@ -166,6 +167,13 @@ class MainWindow(QMainWindow):
         self.label.setText(result)
         return
     
+    def toggleDisplay(self)->None:
+        textOptions = ['Quality\nGraphs', 'Pipeline\nFunctions']
+        newIndex = abs(self.centralStack.currentIndex() - 1)
+        self.centralStack.setCurrentIndex(newIndex)
+        self.visualiserButton.setText(textOptions[newIndex])
+        return
+    
     def timeOutButtons(self)->list:
         timedOut = []
         for button in self.actionButtons:
@@ -205,6 +213,10 @@ class MainWindow(QMainWindow):
         self.flipLowBButton.clicked.connect(self.flipLowB)
         self.flipLowBButton.setFixedSize(65, 45)
 
+        self.visualiserButton = QPushButton("Quality\nGraphs")
+        self.visualiserButton.clicked.connect(self.toggleDisplay)
+        self.visualiserButton.setFixedSize(65, 45)
+
         toolbar.setStyleSheet("""
         QToolBar {
             background: #323D3D;
@@ -219,10 +231,16 @@ class MainWindow(QMainWindow):
             background: #002E2E;
             }
         """)
+        toolbar.addWidget(self.visualiserButton)
         toolbar.addWidget(self.flipLowBButton)
         toolbar.addWidget(self.refreshButton)
         
         return
+
+    def MakeVisualisationWidget(self)->QWidget:
+        visWidget = QWidget()
+
+        return visWidget
 
     def MakeFunctionalWidget(self)->QWidget:
         centralWidgetFunctions = QWidget()
