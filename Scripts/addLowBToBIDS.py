@@ -55,3 +55,9 @@ def FlipLOWBLocation()->str:
         return 'Low-B files moved to lowBFiles/'
     else:
         return 'No files have moved!'
+
+def main()->str:
+    return FlipLOWBLocation()
+
+if __name__ == "__main__":
+    main()
