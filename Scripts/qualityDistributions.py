@@ -91,7 +91,7 @@ def makeOutlierLists(dictOfMeasures: dict) -> None:
     return
 
 
-if runFunc == True:
+def RunFunctional()->None:
 
     diffusionMeasures = {
         'coherence_index': [],
@@ -160,7 +160,7 @@ if runFunc == True:
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
 
-if runAnat == True:
+def RunAnatomical()->None:
         
     extractedMeasures = {
         'snr_total': [],
@@ -223,3 +223,12 @@ if runAnat == True:
         plt.legend().set_visible(False)
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
+
+def main()->None:
+    if runFunc:
+        RunFunctional()
+    if runAnat:
+        RunAnatomical()
+
+if __name__ == "__main__":
+    main()
