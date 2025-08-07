@@ -1,7 +1,7 @@
 import sys
 import os
 from multiprocessing import Process
-from Scripts.Util import Debug, StatusChecker
+from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
@@ -243,6 +243,7 @@ class MainWindow(QMainWindow):
         visWidget = QWidget()
         T1Results, T2Results = qualityDistributions.RunAnatomical()
         FuncResults = qualityDistributions.RunFunctional()
+        t1Paths, t2Paths, dwiPaths = FetchFiles.FetchFigures()
 
         return visWidget
 

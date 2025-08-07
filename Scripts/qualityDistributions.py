@@ -213,7 +213,7 @@ def RunAnatomical()->tuple[dict, dict]:
             )
 
             n = len(extractedMeasures[m])
-            outPath = os.path.join(figuresOutput, f'{m}_distribution_T{t+1}w_n{n}.png')
+            outPath = os.path.join(figuresOutput, f'T{t+1}w_{m}_distribution_n{n}.png')
             plt.title(m)
             plt.legend().set_visible(False)
             sns.despine()
