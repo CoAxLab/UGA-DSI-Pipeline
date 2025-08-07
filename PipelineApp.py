@@ -1,5 +1,6 @@
 import sys
 import os
+from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS
 from PyQt6.QtWidgets import (
@@ -11,7 +12,7 @@ from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.0.3
+0.1.0
 '''
 DEBUG = True
 # End Dev Options
@@ -61,9 +62,9 @@ class MainWindow(QMainWindow):
 
     def setupButtonClick(self)->None:
         self.label.setText("Attempting to set up directories...")
+        self.makeButtonInactive(self.setupButton)
         self.setupAction() # determined when button is initialized
         self.label.setText("Setup complete!")
-        self.makeButtonInactive(self.setupButton)
     
     def niftiButtonClick(self)->None:
         self.clearExecute()
@@ -79,11 +80,11 @@ class MainWindow(QMainWindow):
     def niftiExecute(self)->None:
         self.label.setText("Moving nifti files to BIDS format...")
         restoreThese = self.timeOutButtons()
-        niftiToBids.NiftiToBIDS()
+        self.makeButtonInactive(self.niftiButton)
+        proc = Process(target=niftiToBids.NiftiToBIDS)
+        proc.start()
         self.label.setText("BIDS re-format complete!")
         self.restoreTimedOutButtons(restoreThese)
-        self.makeButtonInactive(self.niftiButton)
-        #self.execButton.clicked.disconnect()
 
     def mriqcButtonClick(self)->None:
         self.clearExecute()
@@ -99,11 +100,11 @@ class MainWindow(QMainWindow):
     def mriqcButtonExecute(self)->None:
         self.label.setText("Running MRIQC...")
         restoreThese = self.timeOutButtons()
-        runQC.RunMRIQC()
+        self.makeButtonInactive(self.mriqcButton)
+        proc = Process(target=runQC.RunMRIQC)
+        proc.start()
         self.label.setText("MRIQC Complete!")
         self.restoreTimedOutButtons(restoreThese)
-        self.makeButtonInactive(self.mriqcButton)
-        #self.execButton.clicked.disconnect()
 
     def srcButtonClick(self)->None:
         self.clearExecute()
@@ -119,12 +120,11 @@ class MainWindow(QMainWindow):
     def srcButtonExecute(self)->None:
         self.label.setText("Running SRC action")
         restoreThese = self.timeOutButtons()
-        runPipeline.RunSRC()
+        self.makeButtonInactive(self.srcButton)
+        proc = Process(target=runPipeline.RunSRC)
+        proc.start()
         self.label.setText("SRC Complete!")
         self.restoreTimedOutButtons(restoreThese)
-        self.makeButtonInactive(self.srcButton)
-        #self.execButton.clicked.disconnect()
-        return
 
     def recButtonClick(self)->None:
         self.clearExecute()
@@ -140,11 +140,11 @@ class MainWindow(QMainWindow):
     def recButtonExecute(self)->None:
         self.label.setText("Running REC action")
         restoreThese = self.timeOutButtons()
-        runPipeline.RunREC()
+        self.makeButtonInactive(self.recButton)
+        proc = Process(target=runPipeline.RunREC)
+        proc.start()
         self.label.setText("REC Complete!")
         self.restoreTimedOutButtons(restoreThese)
-        self.makeButtonInactive(self.recButton)
-        return
     
     def clearExecute(self)->None:
         '''Disconnects Execute Button from any click signals, if connected.'''
