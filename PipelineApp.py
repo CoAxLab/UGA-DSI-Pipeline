@@ -2,7 +2,7 @@ import sys
 import os
 from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker
-from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS
+from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
     QSizePolicy, QToolBar, QTextEdit, QStackedWidget
@@ -78,9 +78,10 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
+        self.clearExecute()
         self.label.setText("Moving nifti files to BIDS format...")
-        restoreThese = self.timeOutButtons()
         self.makeButtonInactive(self.niftiButton)
+        restoreThese = self.timeOutButtons()
         proc = Process(target=niftiToBids.NiftiToBIDS)
         proc.start()
         self.label.setText("BIDS re-format complete!")
@@ -98,9 +99,10 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def mriqcButtonExecute(self)->None:
+        self.clearExecute()
         self.label.setText("Running MRIQC...")
-        restoreThese = self.timeOutButtons()
         self.makeButtonInactive(self.mriqcButton)
+        restoreThese = self.timeOutButtons()
         proc = Process(target=runQC.RunMRIQC)
         proc.start()
         self.label.setText("MRIQC Complete!")
@@ -118,9 +120,10 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def srcButtonExecute(self)->None:
+        self.clearExecute()
         self.label.setText("Running SRC action")
-        restoreThese = self.timeOutButtons()
         self.makeButtonInactive(self.srcButton)
+        restoreThese = self.timeOutButtons()
         proc = Process(target=runPipeline.RunSRC)
         proc.start()
         self.label.setText("SRC Complete!")
@@ -133,14 +136,15 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("SELECTED REC\n")
         self.displayRegion.append("The following ID's will go through Dsi Studio's REC action:")
         source, ids, target = StatusChecker.recStatus()
-        
+
         Debug.Log(StatusChecker.recStatus())
         for id in ids:
             self.displayRegion.append(id)
     def recButtonExecute(self)->None:
+        self.clearExecute()
         self.label.setText("Running REC action")
-        restoreThese = self.timeOutButtons()
         self.makeButtonInactive(self.recButton)
+        restoreThese = self.timeOutButtons()
         proc = Process(target=runPipeline.RunREC)
         proc.start()
         self.label.setText("REC Complete!")
@@ -178,7 +182,6 @@ class MainWindow(QMainWindow):
         timedOut = []
         for button in self.actionButtons:
             if button.isEnabled():
-                #Debug.Log(f'Timeout', DEBUG)
                 timedOut.append(button)
                 button.setDisabled(True)
                 button.setToolTip('Action in progress, please wait.')
@@ -186,7 +189,6 @@ class MainWindow(QMainWindow):
     
     def restoreTimedOutButtons(self, timedOut:list[QPushButton])->None:
         for button in timedOut:
-            #Debug.Log(f'Restore', DEBUG)
             button.setDisabled(False)
             button.setToolTip(None)
     
@@ -239,6 +241,8 @@ class MainWindow(QMainWindow):
 
     def MakeVisualisationWidget(self)->QWidget:
         visWidget = QWidget()
+        T1Results, T2Results = qualityDistributions.RunAnatomical()
+        FuncResults = qualityDistributions.RunFunctional()
 
         return visWidget
 
