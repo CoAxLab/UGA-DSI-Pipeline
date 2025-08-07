@@ -74,10 +74,10 @@ def makeOutlierLists(dictOfMeasures: dict) -> None:
                 outliersList.append(0)
         dictOfMeasures[f'{measure}_Outliers'] = outliersList
     print(f'Created {len(dictOfMeasures) - len(allMeasures)} new keys')
-    return
+    return # mutates parameter dict
 
 
-def RunFunctional()->None:
+def RunFunctional()->dict:
 
     diffusionMeasures = {
         'coherence_index': [],
@@ -145,20 +145,18 @@ def RunFunctional()->None:
         plt.legend().set_visible(False)
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
+    return diffusionMeasures
 
-def RunAnatomical()->None:
-        
-    extractedMeasures = {
-        'snr_total': [],
-        'snr_csf': [],
-        'snr_gm': [],
-        'qi_2': [],
-        'rpve_gm': [],
-        'rpve_wm': [],
-        'rpve_csf': []
-    }
-    namesAnatomical = set(extractedMeasures.keys())
-    extractedMeasures['source_id'] = []
+def RunAnatomical()->tuple[dict, dict]:
+    measures = {'snr_total', 'snr_wm', 'snr_csf', 'snr_gm', 'qi_2', 'rpve_gm', 'rpve_wm', 'rpve_csf'}
+    extractedMeasuresT1 = {}
+    extractedMeasuresT2 = {}
+    for measureString in measures:
+        extractedMeasuresT1[f'{measureString}'] = []
+        extractedMeasuresT2[f'{measureString}'] = []
+
+    extractedMeasuresT1['source_id'] = []
+    extractedMeasuresT2['source_id'] = []
         
     for sub in os.listdir(qcOutputDirectory):
         if 'logs' in sub: continue
@@ -168,47 +166,59 @@ def RunAnatomical()->None:
             if 'figures' in ses: continue
             currSesAnat = os.path.join(currSub, ses, 'anat')
             for file in os.listdir(currSesAnat):
-                if '.json' not in file: continue
-                extractedMeasures['source_id'].append(file)
+                if '.json' not in file: continue # only look for JSON
+                if 'flair' in file: continue # ignore T2w flair, only want cube
                 jsonPath = os.path.join(currSesAnat, file)
+                scanType = file[-8:-5]
                 f = open(jsonPath, 'r')
                 metrics = json.load(f)
-                for key in extractedMeasures:
-                    if key == 'source_id': continue
-                    extractedMeasures[key].append(metrics[key])
+                if scanType == 'T1w':
+                    extractedMeasuresT1[f'source_id'].append(file)
+                    for key in measures:
+                        extractedMeasuresT1[key].append(metrics[key])
+                elif scanType == 'T2w':
+                    extractedMeasuresT2[f'source_id'].append(file)
+                    for key in measures:
+                        extractedMeasuresT2[key].append(metrics[key])
 
-    makeOutlierLists(extractedMeasures)
-    exmDF = pd.DataFrame(extractedMeasures)
-    exmDF.to_csv(os.path.join(figuresOutput, 'anatomicalDF.csv'))
+    makeOutlierLists(extractedMeasuresT1)
+    makeOutlierLists(extractedMeasuresT2)
+    exmDF1 = pd.DataFrame(extractedMeasuresT1)
+    exmDF1.to_csv(os.path.join(figuresOutput, 'anatomicalDF_T1w.csv'))
+    exmDF2 = pd.DataFrame(extractedMeasuresT2)
+    exmDF2.to_csv(os.path.join(figuresOutput, 'anatomicalDF_T2w.csv'))
+    listedDFs = [exmDF1, exmDF2]
 
-    for m in namesAnatomical:
-        plt.figure()
+    for t, extractedMeasures in enumerate([extractedMeasuresT1, extractedMeasuresT2]):
+        for m in measures:
+            plt.figure()
 
-        sns.catplot(
-            data = exmDF,
-            x = m,
-            kind = 'violin',
-            inner = 'quart',
-            color = "#FBECFD2F"
+            sns.catplot(
+                data = listedDFs[t],
+                x = m,
+                kind = 'violin',
+                inner = 'quart',
+                color = "#FBECFD2F"
+                )
+            
+            sns.swarmplot(
+                data = listedDFs[t],
+                x = m,
+                #color = "#7D009C",
+                hue = f'{m}_Outliers',
+                palette= 'magma',
+                edgecolor = "#000000",
+                linewidth = 1,
+                size = 7
             )
-        
-        sns.swarmplot(
-            data = exmDF,
-            x = m,
-            #color = "#7D009C",
-            hue = f'{m}_Outliers',
-            palette= 'magma',
-            edgecolor = "#000000",
-            linewidth = 1,
-            size = 7
-        )
 
-        n = len(extractedMeasures[m])
-        outPath = os.path.join(figuresOutput, f'{m}_distribution_n{n}.png')
-        plt.title(m)
-        plt.legend().set_visible(False)
-        sns.despine()
-        plt.savefig(outPath, bbox_inches = 'tight')
+            n = len(extractedMeasures[m])
+            outPath = os.path.join(figuresOutput, f'{m}_distribution_T{t+1}w_n{n}.png')
+            plt.title(m)
+            plt.legend().set_visible(False)
+            sns.despine()
+            plt.savefig(outPath, bbox_inches = 'tight')
+    return extractedMeasuresT1, extractedMeasuresT2
 
 def main()->None:
     '''
