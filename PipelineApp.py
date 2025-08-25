@@ -5,9 +5,9 @@ from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QSizePolicy, QToolBar, QTextEdit, QStackedWidget
+    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QGraphicsScene
     )
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
 
 # Dev Options:
@@ -238,13 +238,58 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(self.refreshButton)
         
         return
+    
+    def handleFigureTypeSelection(self, newType:str)->None:
+        self.possibleFigures = self.figurePaths[newType]
+        self.currFigureIndex = 0
+        self.drawFigure()
+        self.imageDisplayArea.setPixmap(self.imagePixmap)
+        Debug.Log(f'{newType}')
+        pass
+
+    def drawFigure(self)->None:
+        try:
+            self.imagePixmap = QPixmap(self.possibleFigures[self.currFigureIndex])
+        except Exception as e:
+            Debug.Log(f'No images in Figures/ directory')
+            self.imagePixmap = QPixmap()
 
     def MakeVisualisationWidget(self)->QWidget:
         visWidget = QWidget()
-        T1Results, T2Results = qualityDistributions.RunAnatomical()
-        FuncResults = qualityDistributions.RunFunctional()
+        layout = QHBoxLayout(visWidget)
+        self.controlLabel = QLabel("Controls", self)
+        self.controlLabel.setFont(QFont("Serif", 20))
+        self.controlLabel.setStyleSheet(
+            "color: #00FFDD;"
+            "font-weight: bold;"
+            )
+        controls = QVBoxLayout()
+        controls.addWidget(self.controlLabel)
+        
+        #T1Results, T2Results = qualityDistributions.RunAnatomical()
+        #FuncResults = qualityDistributions.RunFunctional()
         t1Paths, t2Paths, dwiPaths = FetchFiles.FetchFigures()
 
+        self.figurePaths = {
+            'T1w': t1Paths, 
+            'T2w': t2Paths, 
+            'dwi': dwiPaths
+            }
+        self.typePullDown = QComboBox()
+        for i, figType in enumerate(self.figurePaths.keys()):
+            self.typePullDown.insertItem(i, figType)
+        self.typePullDown.currentTextChanged.connect(self.handleFigureTypeSelection)
+        self.possibleFigures = self.figurePaths[self.typePullDown.currentText()]
+        self.currFigureIndex = 0
+        self.drawFigure()
+
+        controls.addWidget(self.typePullDown)
+
+        self.imageDisplayArea = QLabel()
+        self.imageDisplayArea.setPixmap(self.imagePixmap)
+
+        layout.addLayout(controls, stretch=1)
+        layout.addWidget(self.imageDisplayArea, stretch=4)
         return visWidget
 
     def MakeFunctionalWidget(self)->QWidget:
