@@ -5,7 +5,7 @@ from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QGraphicsScene
+    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QSpinBox, QGraphicsScene
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
@@ -242,16 +242,22 @@ class MainWindow(QMainWindow):
     def handleFigureTypeSelection(self, newType:str)->None:
         self.possibleFigures = self.figurePaths[newType]
         self.currFigureIndex = 0
-        self.drawFigure()
-        self.imageDisplayArea.setPixmap(self.imagePixmap)
+        self.drawFigure(self.currFigureIndex)
         Debug.Log(f'{newType}')
+        self.indexController.setMaximum(len(self.possibleFigures))
         pass
 
-    def drawFigure(self)->None:
+    def drawFigure(self, index:int)->None:
+        Debug.Log(f"drawing... {index}", DEBUG)
+        # if index >= len(self.possibleFigures):
+        #     Debug.Log(f"Attempted index was out of range. Resetting to zero.")
+        #     self.currFigureIndex = 0
+        #     index = 0
         try:
-            self.imagePixmap = QPixmap(self.possibleFigures[self.currFigureIndex])
+            self.imagePixmap = QPixmap(self.possibleFigures[index])
+            self.imageDisplayArea.setPixmap(self.imagePixmap)
         except Exception as e:
-            Debug.Log(f'No images in Figures/ directory')
+            Debug.Log(f'No images in Figures/ directory', DEBUG)
             self.imagePixmap = QPixmap()
 
     def MakeVisualisationWidget(self)->QWidget:
@@ -281,9 +287,15 @@ class MainWindow(QMainWindow):
         self.typePullDown.currentTextChanged.connect(self.handleFigureTypeSelection)
         self.possibleFigures = self.figurePaths[self.typePullDown.currentText()]
         self.currFigureIndex = 0
-        self.drawFigure()
+        self.drawFigure(self.currFigureIndex)
 
         controls.addWidget(self.typePullDown)
+
+        self.indexController = QSpinBox() # initialized in handle type selection method
+        self.indexController.setMinimum(0)
+        self.indexController.setMaximum(len(self.possibleFigures))
+        self.indexController.valueChanged.connect(self.drawFigure)
+        controls.addWidget(self.indexController)
 
         self.imageDisplayArea = QLabel()
         self.imageDisplayArea.setPixmap(self.imagePixmap)
