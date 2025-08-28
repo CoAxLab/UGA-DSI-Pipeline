@@ -298,7 +298,11 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.indexController)
 
         self.imageDisplayArea = QLabel()
+        self.imagePixmap = QPixmap(self.possibleFigures[0])
         self.imageDisplayArea.setPixmap(self.imagePixmap)
+
+        controls.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.imageDisplayArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         layout.addLayout(controls, stretch=1)
         layout.addWidget(self.imageDisplayArea, stretch=4)
