@@ -4,8 +4,8 @@ from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QSpinBox, QGraphicsScene
+    QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QDialog, 
+    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QSpinBox, QDialogButtonBox, QGraphicsScene
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
@@ -27,6 +27,20 @@ DEBUG = True
 #         print(f'DEBUG: Beginning action: {self.action} for button named: {self.name}')
 #         self.action()
 
+class WarningPopUp(QDialog):
+    def __init__(self, parent=None)->None:
+        super().__init__(parent)
+        self.setWindowTitle(f'WARNING')
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ignore | QDialogButtonBox.StandardButton.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+        warningMessage = QLabel(f'It is NOT recommended to update your image files if analysis has been performed already.\nIf you proceed, the old image files will be renamed. not overwritten.')
+        layout.addWidget(warningMessage)
+        layout.addWidget(self.buttons)
+        self.setLayout(layout)
 
 class MainWindow(QMainWindow):
     actionButtons:list[QPushButton] = []
@@ -61,6 +75,10 @@ class MainWindow(QMainWindow):
     ### END __init__()
 
     def setupButtonClick(self)->None:
+        warningResponse = WarningPopUp()
+        if not warningResponse.exec():
+            return
+
         self.label.setText("Attempting to set up directories...")
         self.makeButtonInactive(self.setupButton)
         self.setupAction() # determined when button is initialized
