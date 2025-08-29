@@ -23,7 +23,7 @@ def RunSRC()->None:
                 os.mkdir(subSesSRCDir)
             except FileExistsError:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
-                #continue
+                continue
             # source files:
             lowStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-lowb_dwi.nii.gz')
             midStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-midb_dwi.nii.gz')
@@ -70,6 +70,7 @@ def RunREC()->None:
             os.mkdir(recOutDirectory)
         except FileExistsError:
             Debug.Log(f'recon action already complete for subject (target output folder exists already): {subSesID}...')
+            continue
         
         stdFileName, revFileName = None, None
         for file in os.listdir(srcInputDir):
