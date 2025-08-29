@@ -227,15 +227,15 @@ class MainWindow(QMainWindow):
         # buttons
         self.refreshButton  = QPushButton("Refresh")
         self.refreshButton.clicked.connect(self.refreshAll)
-        self.refreshButton.setFixedSize(55, 45)
+        self.refreshButton.setFixedSize(70, 45)
 
         self.flipLowBButton = QPushButton("Flip\nLow B")
         self.flipLowBButton.clicked.connect(self.flipLowB)
-        self.flipLowBButton.setFixedSize(65, 45)
+        self.flipLowBButton.setFixedSize(80, 45)
 
         self.visualiserButton = QPushButton("Quality\nGraphs")
         self.visualiserButton.clicked.connect(self.toggleDisplay)
-        self.visualiserButton.setFixedSize(65, 45)
+        self.visualiserButton.setFixedSize(80, 45)
 
         toolbar.setStyleSheet("""
         QToolBar {
@@ -284,7 +284,7 @@ class MainWindow(QMainWindow):
         self.controlLabel = QLabel("Controls", self)
         self.controlLabel.setFont(QFont("Serif", 20))
         self.controlLabel.setStyleSheet(
-            "color: #00FFDD;"
+            "color: #00695B;"
             "font-weight: bold;"
             )
         controls = QVBoxLayout()
@@ -333,7 +333,7 @@ class MainWindow(QMainWindow):
         self.label = QLabel("Welcome!", self)
         self.label.setFont(QFont("Serif", 20))
         self.label.setStyleSheet(
-            "color: #00FFDD;"
+            "color: #00695B;"
             "font-weight: bold;"
             )
 
