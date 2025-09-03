@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.1.0
+0.2.1
 '''
 DEBUG = True
 # End Dev Options
@@ -96,7 +96,6 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
-        self.clearExecute()
         self.label.setText("Moving nifti files to BIDS format...")
         self.makeButtonInactive(self.niftiButton)
         restoreThese = self.timeOutButtons()
@@ -105,6 +104,7 @@ class MainWindow(QMainWindow):
         proc.join()
         self.label.setText("BIDS re-format complete!")
         self.restoreTimedOutButtons(restoreThese)
+        self.clearExecute()
 
     def mriqcButtonClick(self)->None:
         self.clearExecute()
@@ -118,7 +118,6 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def mriqcButtonExecute(self)->None:
-        self.clearExecute()
         self.label.setText("Running MRIQC...")
         self.makeButtonInactive(self.mriqcButton)
         restoreThese = self.timeOutButtons()
@@ -127,6 +126,7 @@ class MainWindow(QMainWindow):
         proc.join()
         self.label.setText("MRIQC Complete!")
         self.restoreTimedOutButtons(restoreThese)
+        self.clearExecute()
 
     def srcButtonClick(self)->None:
         self.clearExecute()
@@ -140,7 +140,6 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def srcButtonExecute(self)->None:
-        self.clearExecute()
         self.label.setText("Running SRC action")
         self.makeButtonInactive(self.srcButton)
         restoreThese = self.timeOutButtons()
@@ -149,6 +148,7 @@ class MainWindow(QMainWindow):
         proc.join()
         self.label.setText("SRC Complete!")
         self.restoreTimedOutButtons(restoreThese)
+        self.clearExecute()
 
     def recButtonClick(self)->None:
         self.clearExecute()
@@ -162,7 +162,6 @@ class MainWindow(QMainWindow):
         for id in ids:
             self.displayRegion.append(id)
     def recButtonExecute(self)->None:
-        self.clearExecute()
         self.label.setText("Running REC action")
         self.makeButtonInactive(self.recButton)
         restoreThese = self.timeOutButtons()
@@ -171,6 +170,7 @@ class MainWindow(QMainWindow):
         proc.join()
         self.label.setText("REC Complete!")
         self.restoreTimedOutButtons(restoreThese)
+        self.clearExecute()
     
     def clearExecute(self)->None:
         '''Disconnects Execute Button from any click signals, if connected.'''
@@ -266,7 +266,8 @@ class MainWindow(QMainWindow):
         self.currFigureIndex = 0
         self.drawFigure(self.currFigureIndex)
         Debug.Log(f'{newType}')
-        self.indexController.setMaximum(len(self.possibleFigures))
+        self.fillMeasurePullDown()
+        #self.indexController.setMaximum(len(self.possibleFigures))
         pass
 
     def drawFigure(self, index:int)->None:
@@ -281,6 +282,16 @@ class MainWindow(QMainWindow):
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory', DEBUG)
             self.imagePixmap = QPixmap()
+
+    def fillMeasurePullDown(self)->None:
+        self.measurePullDown.clear()
+        for i, path in enumerate(self.possibleFigures):
+            tokens = os.path.basename(path).split('_distribution')
+            currMeasure = tokens[0]
+            if 'dwi_' in currMeasure:
+                currMeasure = currMeasure.replace('dwi_', '')
+            measureLabel = currMeasure.upper()
+            self.measurePullDown.insertItem(i, measureLabel)
 
     def MakeVisualisationWidget(self)->QWidget:
         visWidget = QWidget()
@@ -313,11 +324,16 @@ class MainWindow(QMainWindow):
 
         controls.addWidget(self.typePullDown)
 
-        self.indexController = QSpinBox() # initialized in handle type selection method
-        self.indexController.setMinimum(0)
-        self.indexController.setMaximum(len(self.possibleFigures))
-        self.indexController.valueChanged.connect(self.drawFigure)
-        controls.addWidget(self.indexController)
+        self.measurePullDown = QComboBox()
+        self.fillMeasurePullDown()
+        self.measurePullDown.currentIndexChanged.connect(self.drawFigure)
+        controls.addWidget(self.measurePullDown)
+
+        # self.indexController = QSpinBox() # initialized in handle type selection method
+        # self.indexController.setMinimum(0)
+        # self.indexController.setMaximum(len(self.possibleFigures))
+        # self.indexController.valueChanged.connect(self.drawFigure)
+        # controls.addWidget(self.indexController)
 
         try:
             self.imageDisplayArea = QLabel()
