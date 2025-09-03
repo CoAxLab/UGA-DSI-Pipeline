@@ -102,6 +102,7 @@ class MainWindow(QMainWindow):
         restoreThese = self.timeOutButtons()
         proc = Process(target=niftiToBids.NiftiToBIDS)
         proc.start()
+        proc.join()
         self.label.setText("BIDS re-format complete!")
         self.restoreTimedOutButtons(restoreThese)
 
@@ -123,6 +124,7 @@ class MainWindow(QMainWindow):
         restoreThese = self.timeOutButtons()
         proc = Process(target=runQC.RunMRIQC)
         proc.start()
+        proc.join()
         self.label.setText("MRIQC Complete!")
         self.restoreTimedOutButtons(restoreThese)
 
@@ -144,6 +146,7 @@ class MainWindow(QMainWindow):
         restoreThese = self.timeOutButtons()
         proc = Process(target=runPipeline.RunSRC)
         proc.start()
+        proc.join()
         self.label.setText("SRC Complete!")
         self.restoreTimedOutButtons(restoreThese)
 
@@ -165,6 +168,7 @@ class MainWindow(QMainWindow):
         restoreThese = self.timeOutButtons()
         proc = Process(target=runPipeline.RunREC)
         proc.start()
+        proc.join()
         self.label.setText("REC Complete!")
         self.restoreTimedOutButtons(restoreThese)
     
