@@ -315,9 +315,12 @@ class MainWindow(QMainWindow):
         self.indexController.valueChanged.connect(self.drawFigure)
         controls.addWidget(self.indexController)
 
-        self.imageDisplayArea = QLabel()
-        self.imagePixmap = QPixmap(self.possibleFigures[0])
-        self.imageDisplayArea.setPixmap(self.imagePixmap)
+        try:
+            self.imageDisplayArea = QLabel()
+            self.imagePixmap = QPixmap(self.possibleFigures[0])
+            self.imageDisplayArea.setPixmap(self.imagePixmap)
+        except IndexError:
+            Debug.Log(f'No figures found for initialization.', DEBUG)
 
         controls.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.imageDisplayArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
