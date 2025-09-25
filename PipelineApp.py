@@ -1,6 +1,6 @@
 import sys
 import os
-from multiprocessing import Process
+## from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
 from PyQt6.QtWidgets import (
@@ -99,9 +99,10 @@ class MainWindow(QMainWindow):
         self.label.setText("Moving nifti files to BIDS format...")
         self.makeButtonInactive(self.niftiButton)
         restoreThese = self.timeOutButtons()
-        proc = Process(target=niftiToBids.NiftiToBIDS)
-        proc.start()
-        proc.join()
+        # proc = Process(target=niftiToBids.NiftiToBIDS)
+        # proc.start()
+        # proc.join()
+        niftiToBids.NiftiToBIDS()
         self.label.setText("BIDS re-format complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
@@ -121,9 +122,10 @@ class MainWindow(QMainWindow):
         self.label.setText("Running MRIQC...")
         self.makeButtonInactive(self.mriqcButton)
         restoreThese = self.timeOutButtons()
-        proc = Process(target=runQC.RunMRIQC)
-        proc.start()
-        proc.join()
+        # proc = Process(target=runQC.RunMRIQC)
+        # proc.start()
+        # proc.join()
+        runQC.RunMRIQC()
         self.label.setText("MRIQC Complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
@@ -143,9 +145,10 @@ class MainWindow(QMainWindow):
         self.label.setText("Running SRC action")
         self.makeButtonInactive(self.srcButton)
         restoreThese = self.timeOutButtons()
-        proc = Process(target=runPipeline.RunSRC)
-        proc.start()
-        proc.join()
+        # proc = Process(target=runPipeline.RunSRC)
+        # proc.start()
+        # proc.join()
+        runPipeline.RunSRC()
         self.label.setText("SRC Complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
@@ -165,9 +168,10 @@ class MainWindow(QMainWindow):
         self.label.setText("Running REC action")
         self.makeButtonInactive(self.recButton)
         restoreThese = self.timeOutButtons()
-        proc = Process(target=runPipeline.RunREC)
-        proc.start()
-        proc.join()
+        # proc = Process(target=runPipeline.RunREC)
+        # proc.start()
+        # proc.join()
+        runPipeline.RunREC()
         self.label.setText("REC Complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
