@@ -3,22 +3,22 @@ Welcome, please [report any issues here!](https://github.com/CoAxLab/UGA-DSI-Pip
 ## Setup
 Python module dependencies are listed in requirements.txt.  
 Install these on your base environment individually, or by using:
-'''
+```
 % pip install -r requirements.txt
-'''  
+```  
 
 Alternatively, follow [instructions to create a virtual environment.](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments)  
 Must have [Singularity](https://docs.sylabs.io/guides/latest/user-guide/quick_start.html) and its dependencies installed locally.
 
 If runnung the app for the first time, follow these steps:
 1. Begin by cloning this repository locally to your system.
-'''
+```
 % git clone https://github.com/CoAxLab/UGA-DSI-Pipeline
-'''
+```
 2. Run the app.
-'''
+```
 % python PipelineApp.py
-'''
+```
 3. Click the button that says "Set up directories".  
 This will create all the directories needed to begin using the pipeline, and will create Singularity image files for both DSI Studio and MRIQC. This may take some time.
 4. You should now see a directory called convertToBids/.  
