@@ -3,13 +3,13 @@ Welcome, please [report any issues here!](https://github.com/CoAxLab/UGA-DSI-Pip
 ## Setup
 Begin by cloning this repository locally to your system.
 ```
-% git clone https://github.com/CoAxLab/UGA-DSI-Pipeline
+git clone https://github.com/CoAxLab/UGA-DSI-Pipeline
 ```  
 
 Python module dependencies are listed in requirements.txt.  
 Install these on your base environment individually, or by using:
 ```
-% pip install -r requirements.txt
+pip install -r requirements.txt
 ```  
 
 Alternatively, follow [instructions to create a virtual environment.](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments)  
@@ -18,7 +18,7 @@ Must have [Singularity](https://docs.sylabs.io/guides/latest/user-guide/quick_st
 If runnung the app for the first time, follow these steps:
 1. Run the app.
 ```
-% python PipelineApp.py
+python PipelineApp.py
 ```
 2. Click the button that says "Set up directories".  
 This will create all the directories needed to begin using the pipeline, and will create Singularity image files for both DSI Studio and MRIQC. This may take some time.
