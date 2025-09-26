@@ -32,13 +32,16 @@ If a subject has one session, all data may be placed in the subject folder. If t
 This page contains buttons that will perform various data processing and analysis functions. Clicking on a button will not execute its functionality, but it will be loaded into the "Execute" button. Information about the loaded function and its targeted subjects can be found in the section on the right side of the application window.
 1. "Move nifti files to BIDS directory"  
 
-This button will sort subject data that you have copied to the convertToBids/ directory into BIDS format. It then moves the data to the BIDS/ directory with any previously converted subjects.
+This button will sort subject data that you have copied to the convertToBids/ directory into BIDS format. It then moves the data to the BIDS/ directory with any previously converted subjects.  
+
 2. "Run MRIQC for anatomical data"  
 
-This button will run MRIQC using anatomical data for all listed subjects. The Output can be found in the loosely-BIDS-formatted QCOutput/ directory.
+This button will run MRIQC using anatomical data for all listed subjects. The Output can be found in the loosely-BIDS-formatted QCOutput/ directory.  
+
 3. "Run DSI Studio src action for diffusion data"  
 
-This button will run DSI Studio's src action for all listed subjects. This process should be fairly quick for each subject. Output is located in the src/ directory.
+This button will run DSI Studio's src action for all listed subjects. This process should be fairly quick for each subject. Output is located in the src/ directory.  
+
 4. "Run DSI Studio rec action for diffusion data"  
 
 This button runs reconstruction for each subject using DRI Studio. Its input is subject src data, located in the src/ directory. If there were issues running src for a subject, reconstruction will not run properly. This process is time consuming, and progress can be tracked in the terminal window. Reconstruction output is located in the fib/ directory.
