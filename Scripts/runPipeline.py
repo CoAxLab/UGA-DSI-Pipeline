@@ -82,7 +82,7 @@ def RunREC()->None:
             continue
         srcFileS = os.path.join('/src', subSesID, stdFileName)
         srcFileR = os.path.join('/src', subSesID, revFileName)
-        fibFileOutput = os.path.join('/fib', {subSesID}, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
+        fibFileOutput = os.path.join('/fib', subSesID, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
         if os.path.exists(os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')):
             Debug.Log(f'fib output exists for {subSesID}. Skipping...')
             continue
