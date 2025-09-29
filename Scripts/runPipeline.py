@@ -9,7 +9,7 @@ outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 
-singularityCommand = f'singularity exec {sifFile} --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib'
+singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
 
 def RunSRC()->None:
     ## run src process using b10, b2000, b4000 for each subject
