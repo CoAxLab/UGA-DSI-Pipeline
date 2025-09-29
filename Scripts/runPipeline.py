@@ -26,9 +26,9 @@ def RunSRC()->None:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
                 continue
             # source files:
-            lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-lowb_dwi.nii.gz')
-            midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-midb_dwi.nii.gz')
-            highSandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-highb_dwi.nii.gz')
+            lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
+            midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
+            highSandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-highb_dwi.nii.gz')
             # output file:
             stdOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-std.src.gz')
             srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
@@ -77,7 +77,7 @@ def RunREC()->None:
                 revFileName = file
             elif '.sz' in file:
                 stdFileName = file
-        if stdFileName == None and revFileName == None:
+        if stdFileName == None or revFileName == None:
             Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
             continue
         srcFileS = os.path.join('/src', subSesID, stdFileName)
