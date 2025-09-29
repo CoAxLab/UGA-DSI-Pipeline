@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.2.1
+0.3.0
 '''
 DEBUG = True
 # End Dev Options
