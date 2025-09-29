@@ -4,6 +4,11 @@ Welcome, please [report any issues here!](https://github.com/CoAxLab/UGA-DSI-Pip
 Begin by cloning this repository locally to your system.
 ```
 git clone https://github.com/CoAxLab/UGA-DSI-Pipeline
+```
+
+If you have already installed the pipeline and need to update to the latest version, run this in a terminal window instead:
+```
+git pull origin main
 ```  
 
 Python module dependencies are listed in requirements.txt.  
