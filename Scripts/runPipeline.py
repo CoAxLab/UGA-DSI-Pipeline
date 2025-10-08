@@ -13,7 +13,7 @@ mostRecent = 0
 for imgFile in os.listdir(sifDirectory):
     tokens = imgFile.split('_')
     imageName, tag = tokens[0], tokens[1]
-    if imageName == 'dsistudio': continue
+    if imageName == 'mriqc': continue
     dateNums = tag.split('-')
     if len(dateNums) == 1 and sifFile == None:
         Debug.Log(f'using {imgFile} for {imageName} image')
