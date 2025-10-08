@@ -6,12 +6,29 @@ pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 bidsDirectory = os.path.join(pipelineDirectory, 'BIDS')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
-sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
+#sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
+sifFile = None
+mostRecent = 0
+for imgFile in os.listdir(sifDirectory):
+    tokens = imgFile.split('_')
+    imageName, tag = tokens[0], tokens[1]
+    if imageName == 'dsistudio': continue
+    dateNums = tag.split('-')
+    if len(dateNums) == 1 and sifFile == None:
+        Debug.Log(f'using {imgFile} for {imageName} image')
+        sifFile = os.path.join(sifDirectory, imgFile)
+    elif len(dateNums) == 3:
+        ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
+        if ymd < mostRecent: continue
+        Debug.Log(f'using {imgFile} for {imageName} image')
+        sifFile = os.path.join(sifDirectory, imgFile)
+
 
 singularityCommand = f'singularity exec {sifFile}'
 
 def RunSRC()->None:
     ## run src process using b10, b2000, b4000 for each subject
+    assert(sifFile != None)
     for subjID in os.listdir(bidsDirectory):
         if 'sub-' not in subjID: continue
         subBidsPath = os.path.join(bidsDirectory, subjID)
@@ -62,6 +79,7 @@ def RunSRC()->None:
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 
 def RunREC()->None:
+    assert(sifFile != None)
     for subSesID in os.listdir(outputDirectorySRC):
         start = time.time()
         srcInputDir = os.path.join(outputDirectorySRC, subSesID)
