@@ -7,7 +7,7 @@ sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 bidsDirectory = os.path.join(pipelineDirectory, 'BIDS')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
-#sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
+
 sifFile = None
 mostRecent = 0
 for imgFile in os.listdir(sifDirectory):
@@ -23,6 +23,8 @@ for imgFile in os.listdir(sifDirectory):
         if ymd < mostRecent: continue
         Debug.Log(f'using {imgFile} for {imageName} image')
         sifFile = os.path.join(sifDirectory, imgFile)
+assert(sifFile != None)
+
 
 singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
 

@@ -22,7 +22,7 @@ for imgFile in os.listdir(sifDirectory):
         if ymd < mostRecent: continue
         Debug.Log(f'using {imgFile} for {imageName} image')
         sifFile = os.path.join(sifDirectory, imgFile)
-    
+assert(sifFile != None)
 
 def RunMRIQC()->None:
     for needed in [outDirectoryQC, workDirectory]:
@@ -31,7 +31,6 @@ def RunMRIQC()->None:
         except FileExistsError:
             Debug.Log(f'Directory:\n\t{needed}\nalready exists!')
     #sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
-    assert(sifFile != None)
     singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
 
 
