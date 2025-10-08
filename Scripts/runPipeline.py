@@ -6,6 +6,7 @@ pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 bidsDirectory = os.path.join(pipelineDirectory, 'BIDS')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
+reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 #sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 sifFile = None
 mostRecent = 0
@@ -23,8 +24,7 @@ for imgFile in os.listdir(sifDirectory):
         Debug.Log(f'using {imgFile} for {imageName} image')
         sifFile = os.path.join(sifDirectory, imgFile)
 
-
-singularityCommand = f'singularity exec {sifFile}'
+singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
 
 def RunSRC()->None:
     ## run src process using b10, b2000, b4000 for each subject
@@ -42,19 +42,19 @@ def RunSRC()->None:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
                 continue
             # source files:
-            lowStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-lowb_dwi.nii.gz')
-            midStandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-midb_dwi.nii.gz')
-            highSandard = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_acq-highb_dwi.nii.gz')
+            lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
+            midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
+            highSandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-highb_dwi.nii.gz')
             # output file:
-            stdOutFile = os.path.join(subSesSRCDir, f'{subjID}_{sesDir}_dir-std.src.gz')
+            stdOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-std.src.gz')
             srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
 
             # reversed source files:
-            lowReverse = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-lowb_dwi.nii.gz')
-            midReverse = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-midb_dwi.nii.gz')
-            highReverse = os.path.join(subBidsPath, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-highb_dwi.nii.gz')
+            lowReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-lowb_dwi.nii.gz')
+            midReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-midb_dwi.nii.gz')
+            highReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-highb_dwi.nii.gz')
             # reversed output file:
-            revOutFile = os.path.join(subSesSRCDir, f'{subjID}_{sesDir}_dir-rev.src.gz')
+            revOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-rev.src.gz')
 
             srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
@@ -76,8 +76,6 @@ def RunSRC()->None:
                 else:
                     Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
 
-reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
-
 def RunREC()->None:
     assert(sifFile != None)
     for subSesID in os.listdir(outputDirectorySRC):
@@ -96,13 +94,13 @@ def RunREC()->None:
                 revFileName = file
             elif '.sz' in file:
                 stdFileName = file
-        if stdFileName == None and revFileName == None:
+        if stdFileName == None or revFileName == None:
             Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
             continue
-        srcFileS = os.path.join(srcInputDir, stdFileName)
-        srcFileR = os.path.join(srcInputDir, revFileName)
-        fibFileOutput = os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
-        if os.path.exists(fibFileOutput):
+        srcFileS = os.path.join('/src', subSesID, stdFileName)
+        srcFileR = os.path.join('/src', subSesID, revFileName)
+        fibFileOutput = os.path.join('/fib', subSesID, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
+        if os.path.exists(os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')):
             Debug.Log(f'fib output exists for {subSesID}. Skipping...')
             continue
 
@@ -113,7 +111,7 @@ def RunREC()->None:
         otherImageAddon = ''
         for anatFile in os.listdir(currAnatDir):
             if 'T1w' not in anatFile: continue
-            t1wFilePath = os.path.join(currAnatDir, anatFile)
+            t1wFilePath = os.path.join('/BIDS', currSub, currSes, 'anat', anatFile)
             otherImageAddon = f' --other_image={t1wFilePath}'
 
         if otherImageAddon == '':
@@ -124,9 +122,9 @@ def RunREC()->None:
 
         fullRecCommand = f'{singularityCommand} {reconCommand}'
         print(f'\nRunning DSI Studio recon action for subject: {subSesID}.....\n')
-        os.chdir(srcInputDir)
+        #os.chdir(srcInputDir)
         print(fullRecCommand)
         os.system(fullRecCommand)
         end = time.time()
         print(f'\n{subSesID} recon exited in {end - start} seconds!\n')
-        os.chdir(pipelineDirectory)
+        #os.chdir(pipelineDirectory)

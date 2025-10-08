@@ -12,9 +12,9 @@ from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.2.1
+0.3.1
 '''
-DEBUG = True
+DEBUG = False
 # End Dev Options
 
 # class DSIButton():

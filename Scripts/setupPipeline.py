@@ -1,10 +1,12 @@
 import os
+from datetime import date
 
 pipelineDirectory = os.getcwd()
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sourceDirectoryDCM = os.path.join(pipelineDirectory, 'convertToBids')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 outputDirectoryFIB = os.path.join(pipelineDirectory, 'fib')
+ymd = date.today().strftime('%Y-%m-%d')
 
 def CreateDirs() -> None:
     # create directories
@@ -17,10 +19,12 @@ def CreateDirs() -> None:
 
 def UpdateImages() -> None:
     # pull SIF file for dsi studio
-    os.chdir(sifDirectory)
-    os.system('singularity pull docker://dsistudio/dsistudio:latest')
-    os.system('singularity pull docker://nipreps/mriqc:latest')
-    os.chdir(pipelineDirectory)
+    #os.chdir(sifDirectory)
+    dsiName = os.path.join(sifDirectory, f'dsistudio_{ymd}')
+    qcName = os.path.join(sifDirectory, f'mriqc_{ymd}')
+    os.system(f'singularity pull --name {dsiName} docker://dsistudio/dsistudio:latest')
+    os.system(f'singularity pull --name {qcName} docker://nipreps/mriqc:latest')
+    #os.chdir(pipelineDirectory)
 
 
 
