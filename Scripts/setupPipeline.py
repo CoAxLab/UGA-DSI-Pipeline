@@ -22,8 +22,8 @@ def UpdateImages() -> None:
     #os.chdir(sifDirectory)
     dsiName = os.path.join(sifDirectory, f'dsistudio_{ymd}')
     qcName = os.path.join(sifDirectory, f'mriqc_{ymd}')
-    os.system(f'singularity pull --disable-cache --name {dsiName} docker://dsistudio/dsistudio:latest')
-    os.system(f'singularity pull --disable-cache --name {qcName} docker://nipreps/mriqc:latest')
+    os.system(f'singularity pull --name {dsiName} docker://dsistudio/dsistudio:latest')
+    os.system(f'singularity pull --name {qcName} docker://nipreps/mriqc:latest')
     #os.chdir(pipelineDirectory)
 
 
