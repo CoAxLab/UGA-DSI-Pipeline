@@ -7,22 +7,23 @@ sourceDirectoryBids = os.path.join(pipelineDirectory, 'BIDS')
 outDirectoryQC = os.path.join(pipelineDirectory, 'QCOutput')
 workDirectory = os.path.join(pipelineDirectory, 'work')
 
-sifFile = None
-mostRecent = 0
-for imgFile in os.listdir(sifDirectory):
-    tokens = imgFile.split('_')
-    imageName, tag = tokens[0], tokens[1]
-    if imageName == 'dsistudio': continue
-    dateNums = tag.split('-')
-    if len(dateNums) == 1 and sifFile == None:
-        Debug.Log(f'using {imgFile} for {imageName} image')
-        sifFile = os.path.join(sifDirectory, imgFile)
-    elif len(dateNums) == 3:
-        ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
-        if ymd < mostRecent: continue
-        Debug.Log(f'using {imgFile} for {imageName} image')
-        sifFile = os.path.join(sifDirectory, imgFile)
-assert(sifFile != None)
+def findSIF()->str:
+    sifFile = None
+    mostRecent = 0
+    for imgFile in os.listdir(sifDirectory):
+        tokens = imgFile.split('_')
+        imageName, tag = tokens[0], tokens[1]
+        if imageName == 'dsistudio': continue
+        dateNums = tag.split('-')
+        if len(dateNums) == 1 and sifFile == None:
+            Debug.Log(f'using {imgFile} for {imageName} image')
+            sifFile = os.path.join(sifDirectory, imgFile)
+        elif len(dateNums) == 3:
+            ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
+            if ymd < mostRecent: continue
+            Debug.Log(f'using {imgFile} for {imageName} image')
+            sifFile = os.path.join(sifDirectory, imgFile)
+    return sifFile
 
 def RunMRIQC()->None:
     for needed in [outDirectoryQC, workDirectory]:
@@ -31,6 +32,8 @@ def RunMRIQC()->None:
         except FileExistsError:
             Debug.Log(f'Directory:\n\t{needed}\nalready exists!')
     #sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
+    sifFile = findSIF()
+    assert(sifFile != None)
     singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
 
 

@@ -8,28 +8,30 @@ bidsDirectory = os.path.join(pipelineDirectory, 'BIDS')
 outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 
-sifFile = None
-mostRecent = 0
-for imgFile in os.listdir(sifDirectory):
-    tokens = imgFile.split('_')
-    imageName, tag = tokens[0], tokens[1]
-    if imageName == 'mriqc': continue
-    dateNums = tag.split('-')
-    if len(dateNums) == 1 and sifFile == None:
-        Debug.Log(f'using {imgFile} for {imageName} image')
-        sifFile = os.path.join(sifDirectory, imgFile)
-    elif len(dateNums) == 3:
-        ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
-        if ymd < mostRecent: continue
-        Debug.Log(f'using {imgFile} for {imageName} image')
-        sifFile = os.path.join(sifDirectory, imgFile)
-assert(sifFile != None)
+def findSIF()->str:
+    sifFile = None
+    mostRecent = 0
+    for imgFile in os.listdir(sifDirectory):
+        tokens = imgFile.split('_')
+        imageName, tag = tokens[0], tokens[1]
+        if imageName == 'mriqc': continue
+        dateNums = tag.split('-')
+        if len(dateNums) == 1 and sifFile == None:
+            Debug.Log(f'using {imgFile} for {imageName} image')
+            sifFile = os.path.join(sifDirectory, imgFile)
+        elif len(dateNums) == 3:
+            ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
+            if ymd < mostRecent: continue
+            Debug.Log(f'using {imgFile} for {imageName} image')
+            sifFile = os.path.join(sifDirectory, imgFile)
+    return sifFile
 
 
 singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
 
 def RunSRC()->None:
     ## run src process using b10, b2000, b4000 for each subject
+    sifFile = findSIF()
     assert(sifFile != None)
     for subjID in os.listdir(bidsDirectory):
         if 'sub-' not in subjID: continue
@@ -79,6 +81,7 @@ def RunSRC()->None:
                     Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
 
 def RunREC()->None:
+    sifFile = findSIF()
     assert(sifFile != None)
     for subSesID in os.listdir(outputDirectorySRC):
         start = time.time()
