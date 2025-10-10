@@ -34,7 +34,7 @@ def RunSRC()->None:
     sifFile = findSIF()
     assert(sifFile != None)
     singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
-    
+
     for subjID in os.listdir(bidsDirectory):
         if 'sub-' not in subjID: continue
         subBidsPath = os.path.join(bidsDirectory, subjID)
@@ -85,6 +85,7 @@ def RunSRC()->None:
 def RunREC()->None:
     sifFile = findSIF()
     assert(sifFile != None)
+    singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
     for subSesID in os.listdir(outputDirectorySRC):
         start = time.time()
         srcInputDir = os.path.join(outputDirectorySRC, subSesID)
