@@ -27,12 +27,14 @@ def findSIF()->str:
     return sifFile
 
 
-singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
+
 
 def RunSRC()->None:
     ## run src process using b10, b2000, b4000 for each subject
     sifFile = findSIF()
     assert(sifFile != None)
+    singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
+    
     for subjID in os.listdir(bidsDirectory):
         if 'sub-' not in subjID: continue
         subBidsPath = os.path.join(bidsDirectory, subjID)
