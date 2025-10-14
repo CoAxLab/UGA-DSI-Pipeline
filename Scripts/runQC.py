@@ -11,9 +11,9 @@ def findSIF()->str:
     sifFile = None
     mostRecent = 0
     for imgFile in os.listdir(sifDirectory):
+        if 'mriqc' not in imgFile: continue
         tokens = imgFile.split('_')
         imageName, tag = tokens[0], tokens[1]
-        if imageName == 'dsistudio': continue
         dateNums = tag.split('-')
         if len(dateNums) == 1 and sifFile == None:
             Debug.Log(f'using {imgFile} for {imageName} image')
@@ -21,6 +21,7 @@ def findSIF()->str:
         elif len(dateNums) == 3:
             ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
             if ymd < mostRecent: continue
+            mostRecent = ymd
             Debug.Log(f'using {imgFile} for {imageName} image')
             sifFile = os.path.join(sifDirectory, imgFile)
     return sifFile
