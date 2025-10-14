@@ -1,20 +1,19 @@
-import sys
-import os
+import sys, os, argparse
 ## from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker, FetchFiles
-from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS, qualityDistributions
+from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS#, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QDialog, 
-    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QSpinBox, QDialogButtonBox, QGraphicsScene
+    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QDialogButtonBox#, QGraphicsScene, QSpinBox
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.3.1
+0.3.2
 '''
-DEBUG = False
+DEBUG = True
 # End Dev Options
 
 # class DSIButton():
@@ -464,6 +463,11 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--debug', action='store_true', help='flag to print out debugging statements to terminal')
+    args = parser.parse_args()
+    DEBUG = args.debug
+
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
