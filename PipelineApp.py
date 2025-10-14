@@ -13,7 +13,6 @@ from PyQt6.QtCore import Qt
 VERSION = '''
 0.3.2
 '''
-DEBUG = True
 # End Dev Options
 
 # class DSIButton():
@@ -466,6 +465,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action='store_true', help='flag to print out debugging statements to terminal')
     args = parser.parse_args()
+    global DEBUG
     DEBUG = args.debug
 
     app = QApplication(sys.argv)
