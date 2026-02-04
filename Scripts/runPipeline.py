@@ -85,7 +85,7 @@ def RunSRC()->None:
             srcCommandPart = f'dsi_studio --action=src --source={os.path.join(niftiInDirectory, '*.nii.gz')} --bval={os.path.join(niftiInDirectory, '*.bval')} --bvec={os.path.join(niftiInDirectory, '*.bvec')} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
-            if os.path.exists(singleSRCOutFile):
+            if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
 
                 Debug.Log(f'{subjID}, {sesDir}: src already complete. Skipping...')
 
@@ -122,28 +122,36 @@ def RunREC()->None:
         start = time.time()
         srcInputDir = os.path.join(outputDirectorySRC, subSesID)
         recOutDirectory = os.path.join(reconOutputDirectory, subSesID) # fib/subjectsession/
+
         try:
             os.mkdir(recOutDirectory)
         except FileExistsError:
-            Debug.Log(f'recon action already complete for subject (target output folder exists already): {subSesID}...')
-            continue
+            Debug.Log(f'reconstruction output folder already exists for subject: {subSesID}...')
         
-        stdFileName, revFileName = None, None
-
-        for file in os.listdir(srcInputDir):
-
-            if 'rev' in file and '.sz' in file:
-                revFileName = file
-
-            elif '.sz' in file:
-                stdFileName = file
-
-        if stdFileName == None or revFileName == None:
-            Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
+        srcInContents = os.listdir(srcInputDir)
+        if len(srcInContents) != 1:
+            Debug.Log(f'Found multiple src files where ONE was expected. Skipping {subSesID}')
             continue
+        srcFileName = srcInContents[0]
+        srcFileRelativePath = os.path.join('/src', subSesID, srcFileName)
 
-        srcFileS = os.path.join('/src', subSesID, stdFileName)
-        srcFileR = os.path.join('/src', subSesID, revFileName)
+        # stdFileName, revFileName = None, None
+
+        # for file in srcInContents:
+            
+        #     if 'rev' in file and '.sz' in file:
+        #         revFileName = file
+
+        #     elif '.sz' in file:
+        #         stdFileName = file
+
+        # if stdFileName == None or revFileName == None:
+        #     Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
+        #     continue
+
+    
+        # srcFileS = os.path.join('/src', subSesID, stdFileName)
+        # srcFileR = os.path.join('/src', subSesID, revFileName)
         fibFileOutput = os.path.join('/fib', subSesID, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
 
         if os.path.exists(os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')):
@@ -167,7 +175,7 @@ def RunREC()->None:
             Debug.Log(f' T1w image not found for {subSesID}, running without "--other_image" flag')
 
         settings = '--method=7 --param0=1.25 --template=0 --qsdr_reso=2.0' # optional settings flags
-        reconCommand = f'dsi_studio --action=rec --source={srcFileS} --rev_pe={srcFileR} --output={fibFileOutput} {settings}{otherImageAddon}'
+        reconCommand = f'dsi_studio --action=rec --source={srcFileRelativePath} --output={fibFileOutput} {settings}{otherImageAddon}'
 
         fullRecCommand = f'{singularityCommand} {reconCommand}'
         print(f'\nRunning DSI Studio recon action for subject: {subSesID}.....\n')
