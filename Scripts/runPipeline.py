@@ -9,39 +9,49 @@ outputDirectorySRC = os.path.join(pipelineDirectory, 'src')
 reconOutputDirectory = os.path.join(pipelineDirectory, 'fib')
 
 def findSIF()->str:
+
     sifFile = None
     mostRecent = 0
+
     for imgFile in os.listdir(sifDirectory):
+
         if 'dsistudio' not in imgFile: continue
         tokens = imgFile.split('_')
         imageName, tag = tokens[0], tokens[1]
         if imageName == 'mriqc': continue
         dateNums = tag.split('-')
         if len(dateNums) == 1 and sifFile == None:
+
             Debug.Log(f'using {imgFile} for {imageName} image')
             sifFile = os.path.join(sifDirectory, imgFile)
+
         elif len(dateNums) == 3:
+
             ymd = int(f'{dateNums[0]}{dateNums[1]}{dateNums[2]}')
             if ymd < mostRecent: continue
             mostRecent = ymd
             Debug.Log(f'using {imgFile} for {imageName} image')
             sifFile = os.path.join(sifDirectory, imgFile)
+
     return sifFile
 
 
 
 
 def RunSRC()->None:
+
     ## run src process using b10, b2000, b4000 for each subject
     sifFile = findSIF()
     assert(sifFile != None)
     singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
 
     for subjID in os.listdir(bidsDirectory):
+
         if 'sub-' not in subjID: continue
         subBidsPath = os.path.join(bidsDirectory, subjID)
 
         for sesDir in os.listdir(subBidsPath):
+
             subSesTag = f'{subjID}_{sesDir}'
             subSesSRCDir = os.path.join(outputDirectorySRC, subSesTag)
             try:
@@ -49,6 +59,7 @@ def RunSRC()->None:
             except FileExistsError:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
                 continue
+            
             # source files:
             lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
             midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
@@ -85,10 +96,13 @@ def RunSRC()->None:
                     Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
 
 def RunREC()->None:
+
     sifFile = findSIF()
     assert(sifFile != None)
     singularityCommand = f'singularity exec --bind {bidsDirectory}:/BIDS --bind {outputDirectorySRC}:/src --bind {reconOutputDirectory}:/fib {sifFile}'
+    
     for subSesID in os.listdir(outputDirectorySRC):
+
         start = time.time()
         srcInputDir = os.path.join(outputDirectorySRC, subSesID)
         recOutDirectory = os.path.join(reconOutputDirectory, subSesID) # fib/subjectsession/
@@ -99,17 +113,23 @@ def RunREC()->None:
             continue
         
         stdFileName, revFileName = None, None
+
         for file in os.listdir(srcInputDir):
+
             if 'rev' in file and '.sz' in file:
                 revFileName = file
+
             elif '.sz' in file:
                 stdFileName = file
+
         if stdFileName == None or revFileName == None:
             Debug.Log(f'ERROR: Missing an src file. Fix and re-run!')
             continue
+
         srcFileS = os.path.join('/src', subSesID, stdFileName)
         srcFileR = os.path.join('/src', subSesID, revFileName)
         fibFileOutput = os.path.join('/fib', subSesID, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')
+
         if os.path.exists(os.path.join(recOutDirectory, f'{subSesID}_rec.icbm152_adult.qsdr.1.25.fib.gz')):
             Debug.Log(f'fib output exists for {subSesID}. Skipping...')
             continue
@@ -119,12 +139,15 @@ def RunREC()->None:
         currSub, currSes = tokens[0], tokens[1]
         currAnatDir = os.path.join(bidsDirectory, currSub, currSes, 'anat')
         otherImageAddon = ''
+
         for anatFile in os.listdir(currAnatDir):
+
             if 'T1w' not in anatFile: continue
             t1wFilePath = os.path.join('/BIDS', currSub, currSes, 'anat', anatFile)
             otherImageAddon = f' --other_image={t1wFilePath}'
 
         if otherImageAddon == '':
+
             Debug.Log(f' T1w image not found for {subSesID}, running without "--other_image" flag')
 
         settings = '--method=7 --param0=1.25 --template=0 --qsdr_reso=2.0' # optional settings flags
@@ -132,9 +155,8 @@ def RunREC()->None:
 
         fullRecCommand = f'{singularityCommand} {reconCommand}'
         print(f'\nRunning DSI Studio recon action for subject: {subSesID}.....\n')
-        #os.chdir(srcInputDir)
         print(fullRecCommand)
         os.system(fullRecCommand)
+
         end = time.time()
         print(f'\n{subSesID} recon exited in {end - start} seconds!\n')
-        #os.chdir(pipelineDirectory)
