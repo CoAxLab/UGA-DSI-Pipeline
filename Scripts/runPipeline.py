@@ -58,42 +58,58 @@ def RunSRC()->None:
                 os.mkdir(subSesSRCDir)
             except FileExistsError:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
-                continue
-            
-            # source files:
-            lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
-            midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
-            highSandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-highb_dwi.nii.gz')
-            # output file:
-            stdOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-std.src.gz')
-            srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
+                #continue
 
-            # reversed source files:
-            lowReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-lowb_dwi.nii.gz')
-            midReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-midb_dwi.nii.gz')
-            highReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-highb_dwi.nii.gz')
-            # reversed output file:
-            revOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-rev.src.gz')
+            # # source files:
+            # lowStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-lowb_dwi.nii.gz')
+            # midStandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-midb_dwi.nii.gz')
+            # highSandard = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-std_acq-highb_dwi.nii.gz')
+            # # output file:
+            # stdOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-std.src.gz')
+            # srcCommandStandard = f'dsi_studio --action=src --source={lowStandard} --other_source={midStandard},{highSandard} --output={stdOutFile}'
 
-            srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
+            # # reversed source files:
+            # lowReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-lowb_dwi.nii.gz')
+            # midReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-midb_dwi.nii.gz')
+            # highReverse = os.path.join('/BIDS', subjID, sesDir, 'dwi' , f'{subjID}_{sesDir}_dir-rev_acq-highb_dwi.nii.gz')
+            # # reversed output file:
+            # revOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}_dir-rev.src.gz')
 
-            fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
-            fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
-            
-            skipThese = set()
-            if os.path.exists(stdOutFile):
-                skipThese.add(fullCommandStandard)
-            if os.path.exists(revOutFile):
-                skipThese.add(fullCommandReversed)
+            # srcCommandReversed = f'dsi_studio --action=src --source={lowReverse} --other_source={midReverse},{highReverse} --output={revOutFile}'
 
-            for fullC in [fullCommandReversed, fullCommandStandard]:
-                if fullC not in skipThese:
-                    Debug.Log(f'\nRunning DSI Studio src action for subject: {subjID}, {sesDir}.....\n')
-                    Debug.Log(fullC)
-                    os.system(fullC)
-                    Debug.Log(f'{subjID}, {sesDir} src exited!')
-                else:
-                    Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
+            # fullCommandStandard = f'{singularityCommand} {srcCommandStandard}' # appending standard command to singularity image execution command
+            # fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
+
+            niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
+            singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
+            srcCommandPart = f'dsi_studio --action=src --source={os.path.join(niftiInDirectory, '*.nii.gz')} --bval={os.path.join(niftiInDirectory, '*.bval')} --bvec={os.path.join(niftiInDirectory, '*.bvec')} --output={singleSRCOutFile}'
+            srcFullCommand = f'{singularityCommand} {srcCommandPart}'
+
+            if os.path.exists(singleSRCOutFile):
+
+                Debug.Log(f'{subjID}, {sesDir}: src already complete. Skipping...')
+
+            else:
+
+                Debug.Log(f'\nRunning DSI Studio src action for subject: {subjID}, {sesDir}.....\n')
+                Debug.Log(srcFullCommand)
+                os.system(srcFullCommand)
+                Debug.Log(f'{subjID}, {sesDir} src exited!')
+
+            # skipThese = set()
+            # if os.path.exists(stdOutFile):
+            #     skipThese.add(fullCommandStandard)
+            # if os.path.exists(revOutFile):
+            #     skipThese.add(fullCommandReversed)
+
+            # for fullC in [fullCommandReversed, fullCommandStandard]:
+            #     if fullC not in skipThese:
+            #         Debug.Log(f'\nRunning DSI Studio src action for subject: {subjID}, {sesDir}.....\n')
+            #         Debug.Log(fullC)
+            #         os.system(fullC)
+            #         Debug.Log(f'{subjID}, {sesDir} src exited!')
+            #     else:
+            #         Debug.Log(f'{subjID}, {sesDir}: at least one src already complete. Skipping.')
 
 def RunREC()->None:
 
