@@ -163,7 +163,7 @@ def RunREC()->None:
             Debug.Log(f'Found multiple src files where ONE was expected. Skipping {subSesID}')
             continue
         srcFileName = srcInContents[0]
-        srcFileRelativePath = os.path.join('/src', subSesID, srcFileName)
+        srcFileRelativePath = os.path.join('/src', subSesID, srcFileName, '*.sz')
 
         # stdFileName, revFileName = None, None
 
