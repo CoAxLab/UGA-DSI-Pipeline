@@ -82,9 +82,18 @@ def RunSRC()->None:
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
             singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
-            niftiTargets = os.path.join(niftiInDirectory, '*.nii.gz')
-            bvalTargets = os.path.join(niftiInDirectory, '*.bval')
-            bvecTargets = os.path.join(niftiInDirectory, '*.bvec')
+
+            niftiTargets = ''
+            bvalTargets = ''
+            bvecTargets = ''
+            for file in os.listdir(niftiInDirectory):
+                if '.nii.gz' in file:
+                    niftiTargets = f'{niftiTargets},{os.path.join(niftiInDirectory, file)}'
+                elif '.bval' in file:
+                    bvalTargets = f'{bvalTargets},{os.path.join(niftiInDirectory, file)}'
+                elif '.bvec' in file:
+                    bvecTargets = f'{bvecTargets},{os.path.join(niftiInDirectory, file)}'
+
             srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --bval={bvalTargets} --bvec={bvecTargets} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
