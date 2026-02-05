@@ -82,7 +82,10 @@ def RunSRC()->None:
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
             singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
-            srcCommandPart = f'dsi_studio --action=src --source={os.path.join(niftiInDirectory, '*.nii.gz')} --bval={os.path.join(niftiInDirectory, '*.bval')} --bvec={os.path.join(niftiInDirectory, '*.bvec')} --output={singleSRCOutFile}'
+            niftiTargets = os.path.join(niftiInDirectory, '*.nii.gz')
+            bvalTargets = os.path.join(niftiInDirectory, '*.bval')
+            bvecTargets = os.path.join(niftiInDirectory, '*.bvec')
+            srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --bval={bvalTargets} --bvec={bvecTargets} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
             if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
