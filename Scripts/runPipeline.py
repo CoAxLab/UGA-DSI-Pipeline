@@ -112,7 +112,7 @@ def RunSRC()->None:
             # for s in [niftiTargets, bvalTargets, bvecTargets]:
             #     s = s[:-1]
 
-            srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --bval={bvalTargets} --bvec={bvecTargets} --output={singleSRCOutFile}'
+            srcCommandPart = f'dsi_studio --action=src --source={niftiInDirectory} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
             if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
