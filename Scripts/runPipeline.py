@@ -113,7 +113,7 @@ def RunSRC()->None:
             # for s in [niftiTargets, bvalTargets, bvecTargets]:
             #     s = s[:-1]
             print(f'nifti: |{niftiTargets}|\nbval: |{bvalTargets}|\nbvec: |{bvecTargets}|')
-            srcCommandPart = f'dsi_studio --action=src --source="{niftiTargets}" --output={singleSRCOutFile}'
+            srcCommandPart = f'dsi_studio --action=src --source={niftisWildCard} --other_source={niftisWildCard} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
             if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
