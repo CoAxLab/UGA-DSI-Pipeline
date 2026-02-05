@@ -111,8 +111,8 @@ def RunSRC()->None:
                     bvecTargets = f'{bvecTargets}{os.path.join(niftiInDirectory, file)}'
             # for s in [niftiTargets, bvalTargets, bvecTargets]:
             #     s = s[:-1]
-
-            srcCommandPart = f'dsi_studio --action=src --source={niftiInDirectory} --output={singleSRCOutFile}'
+            print(f'nifti: |{niftiTargets}|\nbval: |{bvalTargets}|\nbvec: |{bvecTargets}|')
+            srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
             if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
@@ -163,7 +163,7 @@ def RunREC()->None:
             Debug.Log(f'Found multiple src files where ONE was expected. Skipping {subSesID}')
             continue
         srcFileName = srcInContents[0]
-        srcFileRelativePath = os.path.join('/src', subSesID, srcFileName, '*.sz')
+        srcFileRelativePath = os.path.join('/src', subSesID, srcFileName)
 
         # stdFileName, revFileName = None, None
 
