@@ -81,6 +81,7 @@ def RunSRC()->None:
             # fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
+            niftisWildCard = os.path.join(niftiInDirectory, '*.nii.gz')
             absNiftiPath = os.path.join(pipelineDirectory, 'BIDS', subjID, sesDir, 'dwi')
             singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
 
@@ -112,7 +113,7 @@ def RunSRC()->None:
             # for s in [niftiTargets, bvalTargets, bvecTargets]:
             #     s = s[:-1]
             print(f'nifti: |{niftiTargets}|\nbval: |{bvalTargets}|\nbvec: |{bvecTargets}|')
-            srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --output={singleSRCOutFile}'
+            srcCommandPart = f'dsi_studio --action=src --source={niftisWildCard} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
 
             if os.path.exists(os.path.join(subSesSRCDir, f'{subjID}_{sesDir}.src.gz')):
