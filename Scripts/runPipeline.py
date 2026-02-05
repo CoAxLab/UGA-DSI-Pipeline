@@ -81,12 +81,13 @@ def RunSRC()->None:
             # fullCommandReversed = f'{singularityCommand} {srcCommandReversed}' # appending reversed command to singularity image execution command
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
+            absNiftiPath = os.path.join(pipelineDirectory, 'BIDS', subjID, sesDir, 'dwi')
             singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
 
             niftiTargets = ''
             bvalTargets = ''
             bvecTargets = ''
-            for file in os.listdir(niftiInDirectory):
+            for file in os.listdir(absNiftiPath):
                 if '.nii.gz' in file:
                     niftiTargets = f'{niftiTargets},{os.path.join(niftiInDirectory, file)}'
                 elif '.bval' in file:
