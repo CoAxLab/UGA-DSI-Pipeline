@@ -92,21 +92,21 @@ def RunSRC()->None:
                 if '.nii.gz' in file:
 
                     if niftiTargets != '':
-                        niftiTargets = f'{niftiTargets}, '
+                        niftiTargets = f'{niftiTargets},'
 
                     niftiTargets = f'{niftiTargets}{os.path.join(niftiInDirectory, file)}'
 
                 elif '.bval' in file:
 
                     if bvalTargets != '':
-                        bvalTargets = f'{bvalTargets}, '
+                        bvalTargets = f'{bvalTargets},'
 
                     bvalTargets = f'{bvalTargets}{os.path.join(niftiInDirectory, file)}'
 
                 elif '.bvec' in file:
 
                     if bvecTargets != '':
-                        bvecTargets = f'{bvecTargets}, '
+                        bvecTargets = f'{bvecTargets},'
 
                     bvecTargets = f'{bvecTargets}{os.path.join(niftiInDirectory, file)}'
             # for s in [niftiTargets, bvalTargets, bvecTargets]:
