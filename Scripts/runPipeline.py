@@ -89,11 +89,13 @@ def RunSRC()->None:
             bvecTargets = ''
             for file in os.listdir(absNiftiPath):
                 if '.nii.gz' in file:
-                    niftiTargets = f'{niftiTargets},{os.path.join(niftiInDirectory, file)}'
+                    niftiTargets = f'{niftiTargets}{os.path.join(niftiInDirectory, file)},'
                 elif '.bval' in file:
-                    bvalTargets = f'{bvalTargets},{os.path.join(niftiInDirectory, file)}'
+                    bvalTargets = f'{bvalTargets}{os.path.join(niftiInDirectory, file)},'
                 elif '.bvec' in file:
-                    bvecTargets = f'{bvecTargets},{os.path.join(niftiInDirectory, file)}'
+                    bvecTargets = f'{bvecTargets}{os.path.join(niftiInDirectory, file)},'
+            for s in [niftiTargets, bvalTargets, bvecTargets]:
+                s = s[:-1]
 
             srcCommandPart = f'dsi_studio --action=src --source={niftiTargets} --bval={bvalTargets} --bvec={bvecTargets} --output={singleSRCOutFile}'
             srcFullCommand = f'{singularityCommand} {srcCommandPart}'
