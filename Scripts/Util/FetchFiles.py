@@ -1,4 +1,5 @@
 import os
+from Scripts import qualityDistributions
 
 pipelineDir = os.getcwd()
 figures = os.path.join(pipelineDir, 'Figures')
@@ -8,6 +9,8 @@ def FetchFigures()->tuple[list, list, list]:
     Returns tuple of lists that contain full file path for figures:
         ([T1wFiles], [T2wFiles], [dwiFiles])
     '''
+    qualityDistributions.RunFunctional()
+    qualityDistributions.RunAnatomical()
     t1, t2, dwi = [], [], []
     for f in os.listdir(figures):
         if '.png' in f:
