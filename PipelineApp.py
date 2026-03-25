@@ -278,9 +278,17 @@ class MainWindow(QMainWindow):
         #     Debug.Log(f"Attempted index was out of range. Resetting to zero.")
         #     self.currFigureIndex = 0
         #     index = 0
+        currType = self.typePullDown.currentText()
+        currMeasure = self.measurePullDown.currentText()
+        outliers = self.OutlierIDDict[currType.lower()][currMeasure.lower()]
+        outlierOneString = '\n'.join(outliers)
+        outlierOneString = outlierOneString.replace('.json', '')
         try:
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
+            self.textStatusRegion.clear()
+            self.textStatusRegion.append("The following sessions were identified as outliers\n")
+            self.textStatusRegion.append(outlierOneString)
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory', DEBUG)
             self.imagePixmap = QPixmap()
@@ -310,6 +318,22 @@ class MainWindow(QMainWindow):
         #T1Results, T2Results = qualityDistributions.RunAnatomical()
         #FuncResults = qualityDistributions.RunFunctional()
         t1Paths, t2Paths, dwiPaths = FetchFiles.FetchFigures()
+        
+        ## Get metadata for figures to identify outlier IDs
+        t1FigMetaData, t2FigMetaData, dwiFigmetaData = FetchFiles.FetchDFs()
+        self.OutlierIDDict = {
+            't1w': {},
+            't2w': {},
+            'dwi': {}
+        }
+        for t, df in enumerate([t1FigMetaData, t2FigMetaData, dwiFigmetaData]):
+            scanTypes = ['t1w', 't2w', 'dwi']
+            currType = scanTypes[t]
+            for col in df:
+                if 'source' in col or 'Outlier' in col or ' ' in col: continue
+                currOutliers = df.loc[df[f'{col}_Outliers'] == 1, 'source_id'].tolist()
+                self.OutlierIDDict[currType][col] = currOutliers
+        print(self.OutlierIDDict)
 
         self.figurePaths = {
             'T1w': t1Paths, 
@@ -317,17 +341,21 @@ class MainWindow(QMainWindow):
             'dwi': dwiPaths
             }
         self.typePullDown = QComboBox()
+        
         for i, figType in enumerate(self.figurePaths.keys()):
             self.typePullDown.insertItem(i, figType)
         self.typePullDown.currentTextChanged.connect(self.handleFigureTypeSelection)
         self.possibleFigures = self.figurePaths[self.typePullDown.currentText()]
         self.currFigureIndex = 0
+
+        self.measurePullDown = QComboBox()
+        self.fillMeasurePullDown()
+
         self.drawFigure(self.currFigureIndex)
 
         controls.addWidget(self.typePullDown)
 
-        self.measurePullDown = QComboBox()
-        self.fillMeasurePullDown()
+        
         self.measurePullDown.currentIndexChanged.connect(self.drawFigure)
         controls.addWidget(self.measurePullDown)
 
@@ -347,8 +375,12 @@ class MainWindow(QMainWindow):
         controls.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.imageDisplayArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.textStatusRegion = QTextEdit()
+        self.textStatusRegion.setReadOnly(True)
+
         layout.addLayout(controls, stretch=1)
         layout.addWidget(self.imageDisplayArea, stretch=4)
+        layout.addWidget(self.textStatusRegion, stretch=1)
         return visWidget
 
     def MakeFunctionalWidget(self)->QWidget:
