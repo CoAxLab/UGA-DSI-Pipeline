@@ -35,7 +35,8 @@ def RunMRIQC()->None:
     #sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
     sifFile = findSIF()
     assert(sifFile != None)
-    singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
+    #singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
+    dockerCommand = f'docker run -it --rm -v {sourceDirectoryBids}:/BIDS -v {outDirectoryQC}:/QCOutput -v {workDirectory}:/work nipreps/mriqc:latest'
 
 
     for subjID in os.listdir(sourceDirectoryBids):
@@ -52,6 +53,6 @@ def RunMRIQC()->None:
             except FileExistsError:
                 Debug.Log(f'Work directory for {subjID}\'s {ses} exists. Skipping...\n\tIf this is not intended, delete and re-run.')
                 continue
-            qcCommand = f'{singularityCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses} --no-sub'
+            qcCommand = f'{dockerCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses} --no-sub'
             Debug.Log(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
             os.system(qcCommand)
