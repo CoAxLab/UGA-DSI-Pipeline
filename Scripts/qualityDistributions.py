@@ -147,7 +147,7 @@ def RunFunctional()->dict:
         formattedTitle = formattedTitle.replace('snr', 'SNR')
         formattedTitle = formattedTitle.replace('rpve', 'RPVE')
         plt.title(formattedTitle)
-        plt.legend().set_visible(False)
+        #plt.legend().set_visible(False)
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
     return diffusionMeasures
@@ -224,7 +224,7 @@ def RunAnatomical()->tuple[dict, dict]:
             formattedTitle = formattedTitle.replace('snr', 'SNR')
             formattedTitle = formattedTitle.replace('rpve', 'RPVE')
             plt.title(formattedTitle)
-            plt.legend().set_visible(False)
+            #plt.legend().set_visible(False)
             sns.despine()
             plt.savefig(outPath, bbox_inches = 'tight')
     return extractedMeasuresT1, extractedMeasuresT2
