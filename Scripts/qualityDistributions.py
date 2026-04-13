@@ -13,7 +13,8 @@ fibDirectory = os.path.join(pipelineDirectory, 'fib')
 qcOutputDirectory = os.path.join(pipelineDirectory, 'QCOutput')
 sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
-singularityCommand = f'singularity exec -B {fibDirectory}:/fib {sifFile}'
+#singularityCommand = f'singularity exec -B {fibDirectory}:/fib {sifFile}'
+dockerCommand = f'docker run -it --rm -v {fibDirectory}:/fib dsistudio/dsistudio:latest'
 
 try:
     os.mkdir(figuresOutput)
@@ -96,7 +97,7 @@ def RunFunctional()->dict:
 
         qcCommandPart = f'dsi_studio --action=qc --source=/fib/{subjectSession}/{fname} --output=/fib/{subjectSession}/qc.tsv'
         
-        fullCommandQC = f'{singularityCommand} {qcCommandPart}'
+        fullCommandQC = f'{dockerCommand} {qcCommandPart}'
 
         if os.path.exists(os.path.join(thisdir, 'qc.tsv')) == False:
             print(f'{fullCommandQC}')
@@ -141,7 +142,11 @@ def RunFunctional()->dict:
 
         n = len(diffusionMeasures[m])
         outPath = os.path.join(figuresOutput, f'dwi_{m}_distribution_n{n}.png')
-        plt.title(m)
+        formattedTitle = m.replace('wm', 'White Matter')
+        formattedTitle = formattedTitle.replace('_', ' ')
+        formattedTitle = formattedTitle.replace('snr', 'SNR')
+        formattedTitle = formattedTitle.replace('rpve', 'RPVE')
+        plt.title(formattedTitle)
         plt.legend().set_visible(False)
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
@@ -214,7 +219,11 @@ def RunAnatomical()->tuple[dict, dict]:
 
             n = len(extractedMeasures[m])
             outPath = os.path.join(figuresOutput, f'T{t+1}w_{m}_distribution_n{n}.png')
-            plt.title(m)
+            formattedTitle = m.replace('wm', 'White Matter')
+            formattedTitle = formattedTitle.replace('_', ' ')
+            formattedTitle = formattedTitle.replace('snr', 'SNR')
+            formattedTitle = formattedTitle.replace('rpve', 'RPVE')
+            plt.title(formattedTitle)
             plt.legend().set_visible(False)
             sns.despine()
             plt.savefig(outPath, bbox_inches = 'tight')
