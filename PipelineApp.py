@@ -287,7 +287,7 @@ class MainWindow(QMainWindow):
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
-            self.textStatusRegion.append("The following sessions were identified as outliers\n")
+            #self.textStatusRegion.append("The following sessions were identified as outliers\n")
             #self.textStatusRegion.append(outlierOneString)
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory', DEBUG)
