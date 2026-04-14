@@ -1,5 +1,6 @@
 import os, json, csv, statistics, argparse
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import pandas as pd
 import seaborn as sns
 from scipy import stats
@@ -148,6 +149,21 @@ def RunFunctional()->dict:
         formattedTitle = formattedTitle.replace('rpve', 'RPVE')
         plt.title(formattedTitle)
         #plt.legend().set_visible(False)
+
+        outliers = dwi_exmDF[dwi_exmDF[f'{m}_Outliers'] == 1]
+        oIDs = []
+
+        for _, row in outliers.iterrows():
+            oIDs.append(
+                Line2D([0], [0], 
+                       marker = 'o',
+                       color = 'w',
+                       label = row['source_id'],
+                       markerfacecolor = 'red',
+                       markersize = 8
+                       )
+            )
+        plt.legend(handles=oIDs, title='Outlier IDs')
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
     return diffusionMeasures
