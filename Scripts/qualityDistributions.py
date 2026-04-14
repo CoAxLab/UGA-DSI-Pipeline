@@ -163,7 +163,7 @@ def RunFunctional()->dict:
                        )
             )
         plt.legend(handles=oIDs, title='Outlier IDs')
-        
+
         sns.despine()
         plt.savefig(outPath, bbox_inches = 'tight')
     return diffusionMeasures
@@ -241,7 +241,7 @@ def RunAnatomical()->tuple[dict, dict]:
             formattedTitle = formattedTitle.replace('rpve', 'RPVE')
             plt.title(formattedTitle)
 
-            outliers = dwi_exmDF[dwi_exmDF[f'{m}_Outliers'] == 1]
+            outliers = listedDFs[t][listedDFs[t][f'{m}_Outliers'] == 1]
             oIDs = []
 
             for _, row in outliers.iterrows():
