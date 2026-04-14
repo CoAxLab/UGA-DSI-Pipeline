@@ -280,15 +280,15 @@ class MainWindow(QMainWindow):
         #     index = 0
         currType = self.typePullDown.currentText()
         currMeasure = self.measurePullDown.currentText()
-        outliers = self.OutlierIDDict[currType.lower()][currMeasure.capitalize()]
-        outlierOneString = '\n'.join(outliers)
-        outlierOneString = outlierOneString.replace('.json', '')
+        #outliers = self.OutlierIDDict[currType.lower()][currMeasure.capitalize()]
+        #outlierOneString = '\n'.join(outliers)
+        #outlierOneString = outlierOneString.replace('.json', '')
         try:
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
             self.textStatusRegion.append("The following sessions were identified as outliers\n")
-            self.textStatusRegion.append(outlierOneString)
+            #self.textStatusRegion.append(outlierOneString)
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory', DEBUG)
             self.imagePixmap = QPixmap()
