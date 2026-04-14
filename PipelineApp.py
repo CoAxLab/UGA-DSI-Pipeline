@@ -280,7 +280,7 @@ class MainWindow(QMainWindow):
         #     index = 0
         currType = self.typePullDown.currentText()
         currMeasure = self.measurePullDown.currentText()
-        outliers = self.OutlierIDDict[currType.lower()][currMeasure.lower()]
+        outliers = self.OutlierIDDict[currType.lower()][currMeasure]
         outlierOneString = '\n'.join(outliers)
         outlierOneString = outlierOneString.replace('.json', '')
         try:
