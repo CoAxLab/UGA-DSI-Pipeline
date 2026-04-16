@@ -53,6 +53,6 @@ def RunMRIQC()->None:
             except FileExistsError:
                 Debug.Log(f'Work directory for {subjID}\'s {ses} exists. Skipping...\n\tIf this is not intended, delete and re-run.')
                 continue
-            qcCommand = f'{dockerCommand} mriqc /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses} --no-sub'
+            qcCommand = f'{dockerCommand} /BIDS /QCOutput participant --participant_label {subjectSTR} --session-id {sessionSTR} --modalities T1w T2w --nprocs 48 --mem-gb 62 -w /work/{subjID}_{ses} --no-sub'
             Debug.Log(f'-=-=-Running MRIQC for {subjID} {ses}\n    {qcCommand}')
             os.system(qcCommand)
