@@ -316,19 +316,17 @@ class MainWindow(QMainWindow):
         controls = QVBoxLayout()
         controls.addWidget(self.controlLabel)
         
-        #T1Results, T2Results = qualityDistributions.RunAnatomical()
-        #FuncResults = qualityDistributions.RunFunctional()
         t1Paths, t2Paths, dwiPaths = FetchFiles.FetchFigures()
         
         ## Get metadata for figures to identify outlier IDs
         t1FigMetaData, t2FigMetaData, dwiFigmetaData = FetchFiles.FetchDFs()
         self.OutlierIDDict = {
-            't1w': {},
-            't2w': {},
+            'T1w': {},
+            'T2w': {},
             'dwi': {}
         }
         for t, df in enumerate([t1FigMetaData, t2FigMetaData, dwiFigmetaData]):
-            scanTypes = ['t1w', 't2w', 'dwi']
+            scanTypes = ['T1w', 'T2w', 'dwi']
             currType = scanTypes[t]
             for col in df:
                 if 'source' in col or 'Outlier' in col or ' ' in col: continue
@@ -346,28 +344,30 @@ class MainWindow(QMainWindow):
         for i, figType in enumerate(self.figurePaths.keys()):
             self.typePullDown.insertItem(i, figType)
         self.typePullDown.currentTextChanged.connect(self.handleFigureTypeSelection)
-        self.possibleFigures = self.figurePaths[self.typePullDown.currentText()]
-        self.currFigureIndex = 0
-
         self.measurePullDown = QComboBox()
-        self.fillMeasurePullDown()
+        self.measurePullDown.currentIndexChanged.connect(self.drawFigure)
 
         controls.addWidget(self.typePullDown)
-        self.measurePullDown.currentIndexChanged.connect(self.drawFigure)
         controls.addWidget(self.measurePullDown)
 
-        try:
-            self.imageDisplayArea = QLabel()
-            self.imagePixmap = QPixmap(self.possibleFigures[0])
-            self.imageDisplayArea.setPixmap(self.imagePixmap)
-        except IndexError:
-            Debug.Log(f'No figures found for initialization.', DEBUG)
-
+        self.imageDisplayArea = QLabel()
         controls.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.imageDisplayArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
         self.textStatusRegion = QTextEdit()
         self.textStatusRegion.setReadOnly(True)
+        self.textStatusRegion.setStyleSheet("""
+                                                QTextEdit {
+                                                    background-color: #1A1A1B;
+                                                    color: #E0E0E0;
+                                                    border: 2px solid #303033;
+                                                    border-radius: 5px;
+                                                    padding: 8px;
+                                                    font-family: 'Consolas', 'Monaco', monospace;
+                                                    font-size: 11pt;
+                                                }
+                                            """)
+
+        self.handleFigureTypeSelection(self.typePullDown.currentText()) ## Fills measure pulldown and draws figure
 
         layout.addLayout(controls, stretch=1)
         layout.addWidget(self.imageDisplayArea, stretch=4)
