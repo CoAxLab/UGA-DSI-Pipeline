@@ -15,6 +15,7 @@ def FetchDFs()->tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     Returns tuple of dataframes that contain figure meta data:
         ([T1wMeta], [T2wMeta], [dwiMeta])
     '''
+    t1, t2, dwi = None, None, None
     for f in os.listdir(figures):
         if '.csv' in f:
             fPath = os.path.join(figures, f)
@@ -24,6 +25,11 @@ def FetchDFs()->tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
                 t2 = pd.read_csv(fPath)
             elif 'diffusion' in f:
                 dwi = pd.read_csv(fPath)
+
+    if t1 is None: t1 = pd.DataFrame()
+    if t2 is None: t2 = pd.DataFrame()
+    if dwi is None: dwi = pd.DataFrame()
+
     return t1, t2, dwi
 
 def FetchFigures()->tuple[list, list, list]:
