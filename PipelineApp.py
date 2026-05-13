@@ -266,18 +266,19 @@ class MainWindow(QMainWindow):
     def handleFigureTypeSelection(self, newType:str)->None:
         self.possibleFigures = self.figurePaths[newType]
         self.currFigureIndex = 0
-        self.drawFigure(self.currFigureIndex)
-        Debug.Log(f'{newType}')
+        #self.drawFigure(self.currFigureIndex)
+        Debug.Log(f'{newType}', DEBUG)
         self.fillMeasurePullDown()
         #self.indexController.setMaximum(len(self.possibleFigures))
         pass
 
     def drawFigure(self, index:int)->None:
+        if index == -1: return
         Debug.Log(f"drawing... {index}", DEBUG)
-        # if index >= len(self.possibleFigures):
-        #     Debug.Log(f"Attempted index was out of range. Resetting to zero.")
-        #     self.currFigureIndex = 0
-        #     index = 0
+        if index >= len(self.possibleFigures):
+            Debug.Log(f"Attempted index was out of range. Resetting to zero.", DEBUG)
+            self.currFigureIndex = 0
+            index = 0
         currType = self.typePullDown.currentText()
         currMeasure = self.measurePullDown.currentText()
         #outliers = self.OutlierIDDict[currType.lower()][currMeasure.capitalize()]
@@ -290,7 +291,7 @@ class MainWindow(QMainWindow):
             #self.textStatusRegion.append("The following sessions were identified as outliers\n")
             #self.textStatusRegion.append(outlierOneString)
         except Exception as e:
-            Debug.Log(f'No images in Figures/ directory', DEBUG)
+            Debug.Log(f'No images in Figures/ directory\n{e}\n', DEBUG)
             self.imagePixmap = QPixmap()
 
     def fillMeasurePullDown(self)->None:
@@ -333,7 +334,7 @@ class MainWindow(QMainWindow):
                 if 'source' in col or 'Outlier' in col or ' ' in col: continue
                 currOutliers = df.loc[df[f'{col}_Outliers'] == 1, 'source_id'].tolist()
                 self.OutlierIDDict[currType][col] = currOutliers
-        print(self.OutlierIDDict)
+        Debug.Log(f'Outlier Dict:\n{self.OutlierIDDict}\n', DEBUG)
 
         self.figurePaths = {
             'T1w': t1Paths, 
@@ -351,19 +352,9 @@ class MainWindow(QMainWindow):
         self.measurePullDown = QComboBox()
         self.fillMeasurePullDown()
 
-        self.drawFigure(self.currFigureIndex)
-
         controls.addWidget(self.typePullDown)
-
-        
         self.measurePullDown.currentIndexChanged.connect(self.drawFigure)
         controls.addWidget(self.measurePullDown)
-
-        # self.indexController = QSpinBox() # initialized in handle type selection method
-        # self.indexController.setMinimum(0)
-        # self.indexController.setMaximum(len(self.possibleFigures))
-        # self.indexController.valueChanged.connect(self.drawFigure)
-        # controls.addWidget(self.indexController)
 
         try:
             self.imageDisplayArea = QLabel()
