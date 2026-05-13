@@ -1,4 +1,5 @@
 import sys, os, argparse
+from collections import defaultdict
 ## from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS#, qualityDistributions
@@ -280,15 +281,42 @@ class MainWindow(QMainWindow):
             self.currFigureIndex = 0
             index = 0
         currType = self.typePullDown.currentText()
-        currMeasure = self.measurePullDown.currentText()
-        #outliers = self.OutlierIDDict[currType.lower()][currMeasure.capitalize()]
-        #outlierOneString = '\n'.join(outliers)
-        #outlierOneString = outlierOneString.replace('.json', '')
+        currMeasure = self.measurePullDown.currentText().lower()
+        currMeasure = currMeasure.replace('r2', 'R2')
+        Debug.Log(f'Curr measure is: {currMeasure}', DEBUG)
         try:
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
-            #self.textStatusRegion.append("The following sessions were identified as outliers\n")
+            Debug.Log(f'current type: {currType}, current measure: {currMeasure})')
+            outlierList = self.OutlierIDDict[currType][currMeasure]
+            htmlContent = """
+            <h3 style='color: #FBECFD; margin-bottom: 10px; border-bottom: 1px solid #444;'>
+                Flagged Outliers
+            </h3>
+            """
+            if outlierList == []:
+                htmlContent += "<p style='color: #50FA7B;'>No outliers detected.</p>"
+            else:
+                grouped = defaultdict(list)
+                for item in outlierList:
+                    # Split 'sub-x_ses-n' for better visual hierarchy
+                    tokens = item.split('_')
+                    sub_id = tokens[0].replace('sub-', '')
+                    ses_id = tokens[1].replace('ses-', '')
+                    grouped[sub_id].append(ses_id)
+                
+                Debug.Log(f'grouped dict: {grouped}')
+                for sub_id in sorted(grouped.keys()):
+                    sessions = ", ".join(sorted(grouped[sub_id]))
+                    htmlContent += f"""
+                    <div style='margin-bottom: 12px;'>
+                        <span style='color: #FF5555; font-weight: bold;'>[!]</span> 
+                        <span style='color: #FBECFD;'>Subject:</span> {sub_id}<br>
+                        <span style='margin-left: 22px; color: #888;'>Sessions: {sessions}</span>
+                    </div>
+                    """
+            self.textStatusRegion.setHtml(htmlContent)
             #self.textStatusRegion.append(outlierOneString)
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory\n{e}\n', DEBUG)
