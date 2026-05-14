@@ -273,6 +273,17 @@ class MainWindow(QMainWindow):
         #self.indexController.setMaximum(len(self.possibleFigures))
         pass
 
+    def getOutlierValue(self, substring:str, measure:str)->float:
+        if 'T1w' in substring:
+            self.t1
+            pass
+        elif 'T2w' in substring:
+            pass
+        else:
+            pass
+
+        # t1FigMetaData, t2FigMetaData, dwiFigmetaData
+
     def drawFigure(self, index:int)->None:
         if index == -1: return
         Debug.Log(f"drawing... {index}", DEBUG)
@@ -289,7 +300,7 @@ class MainWindow(QMainWindow):
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
             Debug.Log(f'current type: {currType}, current measure: {currMeasure})', DEBUG)
-            outlierList = self.OutlierIDDict[currType][currMeasure]
+            outlierList, outlierValuesList = self.OutlierIDDict[currType][currMeasure]
             htmlContent = """
             <h3 style='color: #FBECFD; margin-bottom: 10px; border-bottom: 1px solid #444;'>
                 Flagged Outliers
@@ -299,25 +310,26 @@ class MainWindow(QMainWindow):
                 htmlContent += "<p style='color: #50FA7B;'>No outliers detected.</p>"
             else:
                 grouped = defaultdict(list)
-                for item in outlierList:
+                for i, item in enumerate(outlierList):
                     # Split 'sub-x_ses-n' for better visual hierarchy
                     tokens = item.split('_')
                     sub_id = tokens[0].replace('sub-', '')
                     ses_id = tokens[1].replace('ses-', '')
-                    grouped[sub_id].append(ses_id)
+                    value = outlierValuesList[i]
+                    grouped[sub_id].append(f'{ses_id} ({round(value, 5)})')
                 
                 Debug.Log(f'grouped dict: {grouped}', DEBUG)
                 for sub_id in sorted(grouped.keys()):
-                    sessions = ", ".join(sorted(grouped[sub_id]))
+                    sessions = ",<br>".join(sorted(grouped[sub_id]))
                     htmlContent += f"""
                     <div style='margin-bottom: 12px;'>
                         <span style='color: #FF5555; font-weight: bold;'>[!]</span> 
                         <span style='color: #FBECFD;'>Subject:</span> {sub_id}<br>
-                        <span style='margin-left: 22px; color: #888;'>Sessions: {sessions}</span>
+                        <span style='margin-left: 22px; color: #888;'>Sessions: <br>{sessions}</span>
                     </div>
                     """
             self.textStatusRegion.setHtml(htmlContent)
-            #self.textStatusRegion.append(outlierOneString)
+            
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory\n{e}\n', DEBUG)
             self.imagePixmap = QPixmap()
@@ -359,7 +371,8 @@ class MainWindow(QMainWindow):
             for col in df:
                 if 'source' in col or 'Outlier' in col or ' ' in col: continue
                 currOutliers = df.loc[df[f'{col}_Outliers'] == 1, 'source_id'].tolist()
-                self.OutlierIDDict[currType][col] = currOutliers
+                currValues = df.loc[df[f'{col}_Outliers'] == 1, col].tolist()
+                self.OutlierIDDict[currType][col] = (currOutliers, currValues)
         Debug.Log(f'Outlier Dict:\n{self.OutlierIDDict}\n', DEBUG)
 
         self.figurePaths = {
