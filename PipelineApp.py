@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will be converted to BIDS format:")
         source, ids, target = StatusChecker.niftiStatus()
         
-        Debug.Log(StatusChecker.niftiStatus())
+        Debug.Log(StatusChecker.niftiStatus(), DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will be evaluated by MRIQC:")
         source, ids, target = StatusChecker.qcStatus()
         
-        Debug.Log(StatusChecker.qcStatus())
+        Debug.Log(StatusChecker.qcStatus(), DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def mriqcButtonExecute(self)->None:
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will go through Dsi Studio's SRC action:")
         source, ids, target = StatusChecker.srcStatus()
         
-        Debug.Log(StatusChecker.srcStatus())
+        Debug.Log(StatusChecker.srcStatus(), DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def srcButtonExecute(self)->None:
@@ -160,7 +160,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will go through Dsi Studio's REC action:")
         source, ids, target = StatusChecker.recStatus()
 
-        Debug.Log(StatusChecker.recStatus())
+        Debug.Log(StatusChecker.recStatus(), DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def recButtonExecute(self)->None:
@@ -288,7 +288,7 @@ class MainWindow(QMainWindow):
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
-            Debug.Log(f'current type: {currType}, current measure: {currMeasure})')
+            Debug.Log(f'current type: {currType}, current measure: {currMeasure})', DEBUG)
             outlierList = self.OutlierIDDict[currType][currMeasure]
             htmlContent = """
             <h3 style='color: #FBECFD; margin-bottom: 10px; border-bottom: 1px solid #444;'>
@@ -306,7 +306,7 @@ class MainWindow(QMainWindow):
                     ses_id = tokens[1].replace('ses-', '')
                     grouped[sub_id].append(ses_id)
                 
-                Debug.Log(f'grouped dict: {grouped}')
+                Debug.Log(f'grouped dict: {grouped}', DEBUG)
                 for sub_id in sorted(grouped.keys()):
                     sessions = ", ".join(sorted(grouped[sub_id]))
                     htmlContent += f"""
