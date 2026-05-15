@@ -1,9 +1,11 @@
 import os
 import pandas as pd
 from Scripts import qualityDistributions
+from Scripts.Util import Debug
 
 pipelineDir = os.getcwd()
 figures = os.path.join(pipelineDir, 'Figures')
+fibFiles = os.path.join(pipelineDir, 'fib')
 
 def MakeFigures()->tuple[dict, dict, dict]:
     t1Dict, t2Dict = qualityDistributions.RunAnatomical()
@@ -49,3 +51,17 @@ def FetchFigures()->tuple[list, list, list]:
             elif 'dwi' in f:
                 dwi.append(fPath)
     return t1, t2, dwi
+
+def OpenFibFile(subSes:str)->None:
+    path = os.path.join(fibFiles, subSes)
+    if not os.path.isdir(path):
+        Debug.Log(f'WARNING: target directory does not exist!\n\t{path}', True)
+        return
+    for file in os.listdir(path):
+        if '.fib' in file or '.fz' in file:
+            pathToFib = os.path.join(path, file)
+            print(f'dsi_studio --action=trk --fib={pathToFib}')
+            #os.system(f'dsi_studio --action=trk --fib={pathToFib}')
+            return
+    Debug.Log(f'WARNING: target directory exists, but no fib file found!\n\t{path}', True)
+    return
