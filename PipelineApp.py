@@ -273,17 +273,6 @@ class MainWindow(QMainWindow):
         #self.indexController.setMaximum(len(self.possibleFigures))
         pass
 
-    def getOutlierValue(self, substring:str, measure:str)->float:
-        if 'T1w' in substring:
-            self.t1
-            pass
-        elif 'T2w' in substring:
-            pass
-        else:
-            pass
-
-        # t1FigMetaData, t2FigMetaData, dwiFigmetaData
-
     def drawFigure(self, index:int)->None:
         if index == -1: return
         Debug.Log(f"drawing... {index}", DEBUG)
@@ -360,11 +349,14 @@ class MainWindow(QMainWindow):
         
         ## Get metadata for figures to identify outlier IDs
         t1FigMetaData, t2FigMetaData, dwiFigmetaData = FetchFiles.FetchDFs()
+
+        ## Each subdict has a Measures (str) as keys, mapped to outlierID and outlierValue (tuple)
         self.OutlierIDDict = {
             'T1w': {},
             'T2w': {},
             'dwi': {}
         }
+
         for t, df in enumerate([t1FigMetaData, t2FigMetaData, dwiFigmetaData]):
             scanTypes = ['T1w', 'T2w', 'dwi']
             currType = scanTypes[t]
