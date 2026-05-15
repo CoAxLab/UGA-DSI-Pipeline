@@ -425,16 +425,18 @@ class MainWindow(QMainWindow):
         ### make setup button
         if os.path.isdir('convertToBids'):
             # only refresh images if directory setup already is complete
-            self.setupButton = QPushButton("Pull Singularity images (create or update)")
-            self.setupAction = setupPipeline.UpdateImages
+            # self.setupButton = QPushButton("Pull Singularity images (create or update)")
+            # self.setupAction = setupPipeline.UpdateImages
+            ## 15 May 2026: Singularity pull no longer needed
+            pass
         else:
             Debug.Log(f'Directories have not yet been set up. Doing that now...', DEBUG)
             self.setupButton = QPushButton("Set up directories")
             self.setupAction = setupPipeline.main
-        self.setupButton.clicked.connect(self.setupButtonClick)
-        self.setupButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-        vButtons.addWidget(self.setupButton)
-        self.actionButtons.append(self.setupButton)
+            self.setupButton.clicked.connect(self.setupButtonClick)
+            self.setupButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
+            vButtons.addWidget(self.setupButton)
+            self.actionButtons.append(self.setupButton)
 
         ### make nifti button
         self.niftiButton = QPushButton("Move nifti files to BIDS directory")
