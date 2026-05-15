@@ -5,7 +5,7 @@ from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS#, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QDialog, 
-    QSizePolicy, QToolBar, QTextEdit, QStackedWidget, QComboBox, QDialogButtonBox#, QGraphicsScene, QSpinBox
+    QSizePolicy, QToolBar, QTextEdit, QTextBrowser, QStackedWidget, QComboBox, QDialogButtonBox#, QGraphicsScene, QSpinBox
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
@@ -37,6 +37,21 @@ class WarningPopUp(QDialog):
 
         layout = QVBoxLayout()
         warningMessage = QLabel(f'It is NOT recommended to update your image files if analysis has been performed already.\nIf you proceed, the old image files will be renamed. not overwritten.')
+        layout.addWidget(warningMessage)
+        layout.addWidget(self.buttons)
+        self.setLayout(layout)
+
+class DSIStudioConfirm(QDialog):
+    def __init__(self, parent=None)->None:
+        super().__init__(parent)
+        self.setWindowTitle(f'External Program Confirmation')
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Open | QDialogButtonBox.StandardButton.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+        warningMessage = QLabel(f'You are about to launch DSI Studio fiber tracking.')
         layout.addWidget(warningMessage)
         layout.addWidget(self.buttons)
         self.setLayout(layout)
@@ -305,7 +320,10 @@ class MainWindow(QMainWindow):
                     sub_id = tokens[0].replace('sub-', '')
                     ses_id = tokens[1].replace('ses-', '')
                     value = outlierValuesList[i]
-                    grouped[sub_id].append(f'{ses_id} ({round(value, 5)})')
+                    payload = f'action://sub-{sub_id}_ses-{ses_id}'
+                    displayText = f'{ses_id} ({round(value, 5)})'
+                    linkHTML = f"<a href='{payload}' style='color: #FF5555; text-decoration: none;'>{displayText}</a>"
+                    grouped[sub_id].append(linkHTML)
                 
                 Debug.Log(f'grouped dict: {grouped}', DEBUG)
                 for sub_id in sorted(grouped.keys()):
@@ -322,6 +340,16 @@ class MainWindow(QMainWindow):
         except Exception as e:
             Debug.Log(f'No images in Figures/ directory\n{e}\n', DEBUG)
             self.imagePixmap = QPixmap()
+    
+    def handleLinkClick(self, url)->None: # url is of type QUrl
+
+        dsiConfirmation = DSIStudioConfirm()
+        if not dsiConfirmation.exec():
+            return
+        subSes = url.toString()
+        if subSes.startswith('action://'):
+            subSes = subSes.replace('action://', '')
+        FetchFiles.OpenFibFile(subSes)
 
     def fillMeasurePullDown(self)->None:
         self.measurePullDown.clear()
@@ -386,8 +414,10 @@ class MainWindow(QMainWindow):
         self.imageDisplayArea = QLabel()
         controls.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.imageDisplayArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.textStatusRegion = QTextEdit()
+        self.textStatusRegion = QTextBrowser()
+        self.textStatusRegion.setOpenExternalLinks(False)
         self.textStatusRegion.setReadOnly(True)
+        self.textStatusRegion.anchorClicked.connect(self.handleLinkClick)
         self.textStatusRegion.setStyleSheet("""
                                                 QTextEdit {
                                                     background-color: #1A1A1B;
