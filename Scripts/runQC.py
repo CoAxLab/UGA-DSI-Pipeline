@@ -33,8 +33,8 @@ def RunMRIQC()->None:
         except FileExistsError:
             Debug.Log(f'Directory:\n\t{needed}\nalready exists!')
     #sifFile = os.path.join(sifDirectory, 'mriqc_latest.sif')
-    sifFile = findSIF()
-    assert(sifFile != None)
+    #sifFile = findSIF()
+    #assert(sifFile != None)
     #singularityCommand = f'singularity exec --bind {sourceDirectoryBids}:/BIDS --bind {outDirectoryQC}:/QCOutput --bind {workDirectory}:/work {sifFile}'
     dockerCommand = f'docker run -it --rm -v {sourceDirectoryBids}:/BIDS -v {outDirectoryQC}:/QCOutput -v {workDirectory}:/work nipreps/mriqc:latest'
 
