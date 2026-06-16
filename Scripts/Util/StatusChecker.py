@@ -48,11 +48,13 @@ def compareContents(source:str, target:str)->tuple[set, set, set]:
     
     return sourceSet, sourceSet - targetSet, targetSet
 
-def niftiStatus()->tuple[set, set, set]:
+def niftiStatus(input:str = None)->tuple[set, set, set]:
     '''
     Returns set of ID strings that will be run if nifti to bids is called
     '''
-    return compareContents(nifti, bids)
+    if input == None:
+        input = nifti
+    return compareContents(input, bids)
 
 def qcStatus()->tuple[set,set,set]:
     '''
