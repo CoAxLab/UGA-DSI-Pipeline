@@ -2,6 +2,7 @@ import os
 from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
+dicomDirectory = os.path.join(pipelineDirectory, 'DICOM')
 niftiDirectory = os.path.join(pipelineDirectory, 'convertToBids')
 parentBIDS = os.path.join(pipelineDirectory, 'BIDS')
 lowBFiles = os.path.join(pipelineDirectory, 'lowBFiles')
@@ -58,8 +59,22 @@ def getFileName(file, sub):
     if '.' in newName: return newName, dest
     else: return None, None
 
-def NiftiToBIDS()->None:
+def DoDicomToNifti(input = dicomDirectory)->None:
+    try:
+        os.mkdir(niftiDirectory)
+    except Exception as e:
+        Debug.Log(f'{e}')
+    for sub in os.listdir(input):
+        pathToDcm = os.pat.join(input, sub)
+        outPath = os.path.join(niftiDirectory, sub)
+        ## Make this correct................................................................................
+        dcmCommand = f'dcm2niix --input={pathToDcm} --output={outPath}'
+        os.system(dcmCommand)
+
+def NiftiToBIDS(inputDir:str = None)->None:
     setup = False
+    if inputDir == None:
+        inputDir = niftiDirectory
     for setupDir in [parentBIDS, lowBFiles]:
         try:
             os.mkdir(setupDir)
@@ -77,9 +92,9 @@ def NiftiToBIDS()->None:
 
     allSubIDs = []
 
-    for subjID in os.listdir(niftiDirectory):
+    for subjID in os.listdir(inputDir):
         allSubIDs.append(subjID)
-        currSubDir = os.path.join(niftiDirectory, subjID)
+        currSubDir = os.path.join(inputDir, subjID)
         outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
         outTempDir = os.path.join(lowBFiles, f'sub-{subjID}')
         skip = False
