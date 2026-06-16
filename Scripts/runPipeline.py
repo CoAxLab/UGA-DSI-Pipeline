@@ -161,6 +161,10 @@ def RunREC()->None:
         print(f'\n{subSesID} recon exited in {end - start} seconds!\n')
 
 
+def RunQAExtract()->None:
+    
+    pass
+
 
 def RunSRCSingularity()->None:
 
