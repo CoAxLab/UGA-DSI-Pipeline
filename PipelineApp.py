@@ -5,15 +5,16 @@ from Scripts.Util import Debug, StatusChecker, FetchFiles
 from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS#, qualityDistributions
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QDialog, 
-    QSizePolicy, QToolBar, QTextEdit, QTextBrowser, QStackedWidget, QComboBox, QDialogButtonBox#, QGraphicsScene, QSpinBox
+    QSizePolicy, QToolBar, QTextEdit, QTextBrowser, QStackedWidget, QComboBox, QDialogButtonBox, QFileDialog#, QGraphicsScene, QSpinBox
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
 
 # Dev Options:
 VERSION = '''
-0.4.0
+0.5.0
 '''
+pipelineDirectory = os.getcwd()
 # End Dev Options
 
 # class DSIButton():
@@ -25,6 +26,21 @@ VERSION = '''
 #     def doAction(self):
 #         print(f'DEBUG: Beginning action: {self.action} for button named: {self.name}')
 #         self.action()
+
+class InputDirChangePopUp(QDialog):
+    def __init__(self, parent=None)->None:
+        super().__init__(parent)
+        self.setWindowTitle(f'Change Input Location')
+
+        self.buttons= QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.No)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+        message = QLabel(f'Select OK if you wish to select an input directory separate from the pipeline default')
+        layout.addWidget(message)
+        layout.addWidget(self.buttons)
+        self.setLayout(layout)
 
 class WarningPopUp(QDialog):
     def __init__(self, parent=None)->None:
@@ -88,6 +104,14 @@ class MainWindow(QMainWindow):
                            ''')
     ### END __init__()
 
+    def GetNewDirectoryPath(self)->str:
+        directory = QFileDialog.getExistingDirectory(self,
+                                                     'Select Directory',
+                                                     pipelineDirectory,
+                                                     QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks)
+        return directory if (directory) else None
+
+    ### START Main window buttons
     def setupButtonClick(self)->None:
         warningResponse = WarningPopUp()
         if not warningResponse.exec():
@@ -100,13 +124,18 @@ class MainWindow(QMainWindow):
     
     def niftiButtonClick(self)->None:
         self.clearExecute()
+        selectInputResponse = InputDirChangePopUp()
+        if selectInputResponse.exec():
+            self.niftiDirectory = self.GetNewDirectoryPath()
+        else:
+            self.niftiDirectory = None
         self.execButton.clicked.connect(self.niftiExecute)
         self.displayRegion.clear()
         self.displayRegion.append("SELECTED NIFTI TO BIDS\n")
         self.displayRegion.append("The following ID's will be converted to BIDS format:")
-        source, ids, target = StatusChecker.niftiStatus()
+        source, ids, target = StatusChecker.niftiStatus(self.niftiDirectory)
         
-        Debug.Log(StatusChecker.niftiStatus(), DEBUG)
+        Debug.Log(StatusChecker.niftiStatus(self.niftiDirectory), DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
@@ -116,7 +145,7 @@ class MainWindow(QMainWindow):
         # proc = Process(target=niftiToBids.NiftiToBIDS)
         # proc.start()
         # proc.join()
-        niftiToBids.NiftiToBIDS()
+        niftiToBids.NiftiToBIDS(self.niftiDirectory)
         self.label.setText("BIDS re-format complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
@@ -189,6 +218,7 @@ class MainWindow(QMainWindow):
         self.label.setText("REC Complete!")
         self.restoreTimedOutButtons(restoreThese)
         self.clearExecute()
+    ### END Main buttons
     
     def clearExecute(self)->None:
         '''Disconnects Execute Button from any click signals, if connected.'''
