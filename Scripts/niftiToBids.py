@@ -147,6 +147,8 @@ def NiftiToBIDS(inputDir:str = None)->None:
                     #continue
                     toHere = os.path.join(dwiTempDir, newFile)
                     pass
+                if 'flair' in fileToMove:
+                    continue
                 '''
                 '''
 
@@ -161,3 +163,7 @@ def main()->None:
 
 if __name__ == "__main__":
     main()
+
+#####
+# THIS FILE NEEDS DOCS/FORMAT PASS
+#####
