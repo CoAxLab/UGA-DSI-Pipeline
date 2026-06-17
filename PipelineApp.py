@@ -328,8 +328,8 @@ class MainWindow(QMainWindow):
         currType = self.typePullDown.currentText()
         currMeasure = self.measurePullDown.currentText().lower()
         currMeasure = currMeasure.replace('r2', 'R2')
-        currMeasure = currMeasure.replace('T1W_', '')
-        currMeasure = currMeasure.replace('T2W_', '')
+        currMeasure = currMeasure.replace('t1w_', '')
+        currMeasure = currMeasure.replace('t2w_', '')
         Debug.Log(f'Curr measure is: {currMeasure}', DEBUG)
         try:
             self.imagePixmap = QPixmap(self.possibleFigures[index])
