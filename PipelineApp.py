@@ -335,6 +335,7 @@ class MainWindow(QMainWindow):
             self.textStatusRegion.clear()
             Debug.Log(f'current type: {currType}, current measure: {currMeasure})', DEBUG)
             outlierList, outlierValuesList = self.OutlierIDDict[currType][currMeasure]
+            Debug.Log(f'Outlier List and Values: {outlierList}\n{outlierValuesList}')
             htmlContent = """
             <h3 style='color: #FBECFD; margin-bottom: 10px; border-bottom: 1px solid #444;'>
                 Flagged Outliers
@@ -342,6 +343,7 @@ class MainWindow(QMainWindow):
             """
             if outlierList == []:
                 htmlContent += "<p style='color: #50FA7B;'>No outliers detected.</p>"
+                Debug.Log(f'Not Creating HTML Entries: No Outliers', DEBUG)
             else:
                 grouped = defaultdict(list)
                 for i, item in enumerate(outlierList):
@@ -354,6 +356,7 @@ class MainWindow(QMainWindow):
                     displayText = f'{ses_id} ({round(value, 5)})'
                     linkHTML = f"<a href='{payload}' style='color: #FF5555; text-decoration: none;'>{displayText}</a>"
                     grouped[sub_id].append(linkHTML)
+                    Debug.Log(f'Created Hyperlink', DEBUG)
                 
                 Debug.Log(f'grouped dict: {grouped}', DEBUG)
                 for sub_id in sorted(grouped.keys()):
@@ -365,6 +368,7 @@ class MainWindow(QMainWindow):
                         <span style='margin-left: 22px; color: #888;'>Sessions: <br>{sessions}</span>
                     </div>
                     """
+                    Debug.Log(f'Created HTML Entry', DEBUG)
             self.textStatusRegion.setHtml(htmlContent)
             
         except Exception as e:
