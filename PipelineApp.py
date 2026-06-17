@@ -333,9 +333,9 @@ class MainWindow(QMainWindow):
             self.imagePixmap = QPixmap(self.possibleFigures[index])
             self.imageDisplayArea.setPixmap(self.imagePixmap)
             self.textStatusRegion.clear()
-            Debug.Log(f'current type: {currType}, current measure: {currMeasure})', DEBUG)
+            #Debug.Log(f'current type: {currType}, current measure: {currMeasure})', DEBUG)
             outlierList, outlierValuesList = self.OutlierIDDict[currType][currMeasure]
-            Debug.Log(f'Outlier List and Values: {outlierList}\n{outlierValuesList}')
+            #Debug.Log(f'Outlier List and Values: {outlierList}\n{outlierValuesList}', DEBUG)
             htmlContent = """
             <h3 style='color: #FBECFD; margin-bottom: 10px; border-bottom: 1px solid #444;'>
                 Flagged Outliers
@@ -423,6 +423,7 @@ class MainWindow(QMainWindow):
             scanTypes = ['T1w', 'T2w', 'dwi']
             currType = scanTypes[t]
             for col in df:
+                Debug.Log(f'Outliers for measure: {currType},{col}', DEBUG)
                 if 'source' in col or 'Outlier' in col or ' ' in col: continue
                 currOutliers = df.loc[df[f'{col}_Outliers'] == 1, 'source_id'].tolist()
                 currValues = df.loc[df[f'{col}_Outliers'] == 1, col].tolist()
