@@ -427,6 +427,7 @@ class MainWindow(QMainWindow):
                 if 'source' in col or 'Outlier' in col or ' ' in col: continue
                 currOutliers = df.loc[df[f'{col}_Outliers'] == 1, 'source_id'].tolist()
                 currValues = df.loc[df[f'{col}_Outliers'] == 1, col].tolist()
+                Debug.Log(f'Adding to Outlier Dict: {currOutliers},{currValues}', DEBUG)
                 self.OutlierIDDict[currType][col] = (currOutliers, currValues)
         Debug.Log(f'Outlier Dict:\n{self.OutlierIDDict}\n', DEBUG)
 
