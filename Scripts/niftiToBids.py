@@ -145,7 +145,7 @@ def NiftiToBIDS(inputDir:str = None)->None:
                 '''
                 if 'b10_' in fileToMove:
                     #continue
-                    toHere = os.path.join(dwiTempDir, newFile)
+                    #toHere = os.path.join(dwiTempDir, newFile)
                     pass
                 if 'flair' in fileToMove:
                     continue
