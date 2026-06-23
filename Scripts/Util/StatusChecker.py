@@ -73,3 +73,9 @@ def recStatus()->tuple[set,set,set]:
     Returns set of ID strings that will be run if rec is called
     '''
     return compareContents(src, fib)
+
+def SetupDirsStatus()->bool:
+    '''
+    Returns true if setup dirs exist, false if ANY are missing.
+    '''
+    return os.path.isdir(nifti) and os.path.isdir(src) and os.path.isdir(fib)
