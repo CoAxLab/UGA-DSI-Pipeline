@@ -491,12 +491,9 @@ class MainWindow(QMainWindow):
         vButtons.addWidget(self.label)
 
         ### make setup button
-        if os.path.isdir('convertToBids'):
-            # only refresh images if directory setup already is complete
-            # self.setupButton = QPushButton("Pull Singularity images (create or update)")
-            # self.setupAction = setupPipeline.UpdateImages
-            ## 15 May 2026: Singularity pull no longer needed
-            pass
+        setupDirsExist = StatusChecker.SetupDirsStatus()
+        if setupDirsExist:
+            Debug.Log(f'Setup not needed.', DEBUG)
         else:
             Debug.Log(f'Directories have not yet been set up. Doing that now...', DEBUG)
             self.setupButton = QPushButton("Set up directories")
