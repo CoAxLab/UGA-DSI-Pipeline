@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
+from Scripts.ProcessingScripts.DoMigration import CheckAndMigrate
 
 # Dev Options:
 VERSION = '''
@@ -121,6 +122,7 @@ class MainWindow(QMainWindow):
         self.label.setText("Attempting to set up directories...")
         self.makeButtonInactive(self.setupButton)
         self.setupAction() # determined when button is initialized
+        CheckAndMigrate()
         self.label.setText("Setup complete!")
     
     def niftiButtonClick(self)->None:
