@@ -9,11 +9,11 @@ from scipy import stats
 Globals and setup
 '''
 pipelineDirectory = os.getcwd()
-figuresOutput = os.path.join(pipelineDirectory, 'Figures')
-fibDirectory = os.path.join(pipelineDirectory, 'fib')
-qcOutputDirectory = os.path.join(pipelineDirectory, 'QCOutput')
-sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
-sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
+figuresOutput = os.path.join(pipelineDirectory, 'Output', 'Figures')
+fibDirectory = os.path.join(pipelineDirectory, 'Output', 'fib')
+qcOutputDirectory = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
+#sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
+#sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 #singularityCommand = f'singularity exec -B {fibDirectory}:/fib {sifFile}'
 dockerCommand = f'docker run -it --rm -v {fibDirectory}:/fib dsistudio/dsistudio:latest'
 

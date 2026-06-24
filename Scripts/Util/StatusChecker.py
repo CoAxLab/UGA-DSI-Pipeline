@@ -2,12 +2,12 @@ import os
 from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
-nifti = os.path.join(pipelineDirectory, 'convertToBids')
-bids = os.path.join(pipelineDirectory, 'BIDS')
-lowB = os.path.join(pipelineDirectory, 'lowBFiles')
-qc = os.path.join(pipelineDirectory, 'QCOutput')
-src = os.path.join(pipelineDirectory, 'src')
-fib = os.path.join(pipelineDirectory, 'fib')
+nifti = os.path.join(pipelineDirectory, 'Data', 'InputData')
+bids = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
+
+qc = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
+src = os.path.join(pipelineDirectory, 'Output', 'src')
+fib = os.path.join(pipelineDirectory, 'Output', 'fib')
 
 def compareContents(source:str, target:str)->tuple[set, set, set]:
     if os.path.isdir(source) == False:

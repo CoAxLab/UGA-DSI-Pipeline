@@ -4,8 +4,8 @@ from Scripts import qualityDistributions
 from Scripts.Util import Debug
 
 pipelineDir = os.getcwd()
-figures = os.path.join(pipelineDir, 'Figures')
-fibFiles = os.path.join(pipelineDir, 'fib')
+figures = os.path.join(pipelineDir, 'Output', 'Figures')
+fibFiles = os.path.join(pipelineDir, 'Output', 'fib')
 
 def MakeFigures()->tuple[dict, dict, dict]:
     t1Dict, t2Dict = qualityDistributions.RunAnatomical()

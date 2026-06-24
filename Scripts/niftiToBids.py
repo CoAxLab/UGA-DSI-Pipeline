@@ -2,12 +2,11 @@ import os
 from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
-dicomDirectory = os.path.join(pipelineDirectory, 'DICOM')
-niftiDirectory = os.path.join(pipelineDirectory, 'convertToBids')
-parentBIDS = os.path.join(pipelineDirectory, 'BIDS')
-lowBFiles = os.path.join(pipelineDirectory, 'lowBFiles')
+dicomDirectory = os.path.join(pipelineDirectory, 'Data', 'DICOM')
+niftiDirectory = os.path.join(pipelineDirectory, 'Data', 'InputData')
+parentBIDS = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
 
-
+DEBUG = False
 
 def getFileName(file, sub):
     '''returns (newFilename, destination)'''
@@ -75,18 +74,16 @@ def NiftiToBIDS(inputDir:str = None)->None:
     setup = False
     if inputDir == None:
         inputDir = niftiDirectory
-    for setupDir in [parentBIDS, lowBFiles]:
-        try:
-            os.mkdir(setupDir)
-            setup = True
-        except Exception as e:
-            pass
-            #print(f'Moving on without additional setup steps...\n')
+    try:
+        os.mkdir(parentBIDS)
+        setup = True
+    except Exception as e:
+        pass # Further setup is not needed.
+
     descFName = 'dataset_description.json'
     if setup:
         os.system(f'cp CHANGEME_dataset_description.json {os.path.join(parentBIDS, descFName)}')
         os.chdir(parentBIDS)
-        #os.system('touch dataset_description.json')
         os.system('touch participants.tsv')
         os.chdir(pipelineDirectory)
 
@@ -96,18 +93,14 @@ def NiftiToBIDS(inputDir:str = None)->None:
         allSubIDs.append(subjID)
         currSubDir = os.path.join(inputDir, subjID)
         outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
-        outTempDir = os.path.join(lowBFiles, f'sub-{subjID}')
+
         skip = False
-        for d in [outDirectory, outTempDir]:
-            if 'BIDS' in d:
-                messagePart = 'BIDS'
-            elif 'lowB' in d:
-                messagePart = 'lowB'
-            try:
-                os.mkdir(d)
-            except Exception as e:
-                Debug.Log(f'{messagePart} output directories already exist for {subjID}.\nMoving on...')
-                skip = True
+
+        try:
+            os.mkdir(outDirectory)
+        except Exception as e:
+            Debug.Log(f'BIDS output directories (at Data/AnalysisData/) already exist for {subjID}.\nMoving on...', DEBUG)
+            skip = True
         if skip == True:
             continue
 
@@ -115,18 +108,13 @@ def NiftiToBIDS(inputDir:str = None)->None:
         for sesID in os.listdir(currSubDir):
             currNifti = os.path.join(currSubDir, sesID)
             sesOutDir = os.path.join(outDirectory, f'ses-{sesN}')
-            sesOutTempDir = os.path.join(outTempDir, f'ses-{sesN}')
             os.mkdir(sesOutDir)
-            os.mkdir(sesOutTempDir)
 
             anatDir = os.path.join(sesOutDir, 'anat')
             dwiDir = os.path.join(sesOutDir, 'dwi')
-            dwiTempDir = os.path.join(sesOutTempDir, 'dwi')
             os.mkdir(anatDir)
             os.mkdir(dwiDir)
-            os.mkdir(dwiTempDir)
             
-            #print(os.listdir(currNifti))
             for fileToMove in os.listdir(currNifti):
                 # Begin sorting files from nifti directory
                 oldFile = os.path.join(currNifti, fileToMove)
@@ -143,17 +131,15 @@ def NiftiToBIDS(inputDir:str = None)->None:
                 '''
                 change the content of the below statement between passs and continue based on desire for b10 files in output
                 '''
-                if 'b10_' in fileToMove:
-                    #continue
-                    #toHere = os.path.join(dwiTempDir, newFile)
-                    pass
+
                 if 'flair' in fileToMove:
                     continue
                 '''
+                Do not move T2w flair data
                 '''
 
                 copyCMD = f'cp {oldFile} {toHere}'
-                #print(copyCMD)
+
                 os.system(copyCMD)
             sesN += 1
 
@@ -163,7 +149,3 @@ def main()->None:
 
 if __name__ == "__main__":
     main()
-
-#####
-# THIS FILE NEEDS DOCS/FORMAT PASS
-#####
