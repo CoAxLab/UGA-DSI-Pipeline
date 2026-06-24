@@ -5,14 +5,15 @@ parentBIDS = os.path.join(pipelineDirectory, 'BIDS')
 
 def FlipLOWBLocation()->str:
     '''
+    **DEPRECATED**
     Moves low-b files either to the lowBFiles dir or the BIDS dir.
     Target directory is determined by location of first lowB files encountered.
         -This will un-scatter the files
     Returns string of target location -> ('BIDS' or 'lowBFiles')
     '''
     toBids = False
-    toLowB = False
-    print(f'Moving low-b files. Outputs should all match.')
+    # toLowB = False
+    Debug.Log(f'Moving low-b files. Outputs should all match.')
     for id in os.listdir(parentBIDS):
         subBIDS = os.path.join(parentBIDS, id)
         if os.path.isdir(subBIDS) == False:
@@ -23,9 +24,9 @@ def FlipLOWBLocation()->str:
             dwiPath = os.path.join(subBIDS, ses, 'dwi')
             lowBPath = dwiPath.replace('BIDS', 'lowBFiles')
             if os.listdir(lowBPath) != []: ### if lowBFiles has the files, then move them to BIDS folder
-                if toLowB == True: 
-                    Debug.Log(f"Low b files are scattered. Skipping {id}, {ses} to fix.")
-                    continue
+                # if toLowB == True: 
+                #     Debug.Log(f"Low b files are scattered. Skipping {id}, {ses} to fix.")
+                #     continue
                 if os.path.isdir(lowBPath) == False:
                     Debug.Log(f'{id}, {ses} has no LowB dwi path, skipping')
                     continue
@@ -36,23 +37,25 @@ def FlipLOWBLocation()->str:
                     os.system(f'mv {lowBFile} {target}')
                     print(f'Sub: {id}: Moved file to BIDS/')
             else: ### lowBFiles does not have the files, move them here
-                if toBids == True: 
-                    Debug.Log(f"Low b files are scattered. Skipping {id}, {ses} to fix.")
-                    continue
-                if os.path.isdir(dwiPath) == False:
-                    Debug.Log(f'{id}, {ses} has no BIDS dwi path, skipping')
-                    continue
-                toLowB = True
-                for f in os.listdir(dwiPath):
-                    if 'lowb' in f:
-                        lowBFile = os.path.join(dwiPath, f)
-                        target = os.path.join(lowBPath, f)
-                        os.system(f'mv {lowBFile} {target}')
-                        print(f'Sub {id}: Moved file to lowBFiles/')
+                Debug.Log('Legacy lowBFiles folder needs to be emptied. Further use of this button will not function and will be removed in a future update!')
+                Debug.Log('Please move BIDS/ content to Data/AnalysisData/')
+                # if toBids == True: 
+                #     Debug.Log(f"Low b files are scattered. Skipping {id}, {ses} to fix.")
+                #     continue
+                # if os.path.isdir(dwiPath) == False:
+                #     Debug.Log(f'{id}, {ses} has no BIDS dwi path, skipping')
+                #     continue
+                # toLowB = True
+                # for f in os.listdir(dwiPath):
+                #     if 'lowb' in f:
+                #         lowBFile = os.path.join(dwiPath, f)
+                #         target = os.path.join(lowBPath, f)
+                #         os.system(f'mv {lowBFile} {target}')
+                #         print(f'Sub {id}: Moved file to lowBFiles/')
     if toBids:
         return 'Low-B files moved to BIDS/'
-    if toLowB:
-        return 'Low-B files moved to lowBFiles/'
+    # if toLowB:
+    #     return 'Low-B files moved to lowBFiles/'
     else:
         return 'No files have moved!'
 
