@@ -2,10 +2,11 @@ import sys, os, argparse
 from collections import defaultdict
 ## from multiprocessing import Process
 from Scripts.Util import Debug, StatusChecker, FetchFiles
-from Scripts import niftiToBids, runPipeline, runQC, setupPipeline, addLowBToBIDS#, qualityDistributions
+from Scripts.ProcessingScripts import niftiToBids, runPipeline,  setupPipeline, addLowBToBIDS
+from Scripts.AnalysisScripts import runQC
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QDialog, 
-    QSizePolicy, QToolBar, QTextEdit, QTextBrowser, QStackedWidget, QComboBox, QDialogButtonBox, QFileDialog#, QGraphicsScene, QSpinBox
+    QSizePolicy, QToolBar, QTextEdit, QTextBrowser, QStackedWidget, QComboBox, QDialogButtonBox, QFileDialog
     )
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
@@ -410,6 +411,7 @@ class MainWindow(QMainWindow):
         controls.addWidget(self.controlLabel)
         
         t1Paths, t2Paths, dwiPaths = FetchFiles.FetchFigures()
+
         
         ## Get metadata for figures to identify outlier IDs
         t1FigMetaData, t2FigMetaData, dwiFigmetaData = FetchFiles.FetchDFs()

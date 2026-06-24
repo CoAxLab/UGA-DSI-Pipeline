@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from Scripts import qualityDistributions
+from Scripts.AnalysisScripts import qualityDistributions
 from Scripts.Util import Debug
 
 pipelineDir = os.getcwd()
@@ -18,15 +18,17 @@ def FetchDFs()->tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         ([T1wMeta], [T2wMeta], [dwiMeta])
     '''
     t1, t2, dwi = None, None, None
-    for f in os.listdir(figures):
-        if '.csv' in f:
-            fPath = os.path.join(figures, f)
-            if 'T1w' in f:
-                t1 = pd.read_csv(fPath)
-            elif 'T2w' in f:
-                t2 = pd.read_csv(fPath)
-            elif 'diffusion' in f:
-                dwi = pd.read_csv(fPath)
+    if os.path.isdir(figures):
+        #raise Exception(f'Figures not set up.')
+        for f in os.listdir(figures):
+            if '.csv' in f:
+                fPath = os.path.join(figures, f)
+                if 'T1w' in f:
+                    t1 = pd.read_csv(fPath)
+                elif 'T2w' in f:
+                    t2 = pd.read_csv(fPath)
+                elif 'diffusion' in f:
+                    dwi = pd.read_csv(fPath)
 
     if t1 is None: t1 = pd.DataFrame()
     if t2 is None: t2 = pd.DataFrame()
@@ -41,15 +43,17 @@ def FetchFigures()->tuple[list, list, list]:
     '''
     #MakeFigures()
     t1, t2, dwi = [], [], []
-    for f in os.listdir(figures):
-        if '.png' in f:
-            fPath = os.path.join(figures, f)
-            if 'T1w' in f:
-                t1.append(fPath)
-            elif 'T2w' in f:
-                t2.append(fPath)
-            elif 'dwi' in f:
-                dwi.append(fPath)
+    if os.path.isdir(figures):
+        #raise Exception(f'Figures not set up.')
+        for f in os.listdir(figures):
+            if '.png' in f:
+                fPath = os.path.join(figures, f)
+                if 'T1w' in f:
+                    t1.append(fPath)
+                elif 'T2w' in f:
+                    t2.append(fPath)
+                elif 'dwi' in f:
+                    dwi.append(fPath)
     return t1, t2, dwi
 
 def OpenFibFile(subSes:str)->None:
