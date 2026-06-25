@@ -3,14 +3,23 @@ from datetime import date
 
 pipelineDirectory = os.getcwd()
 
+allSetupPaths = []
+
+
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Data'))
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Output'))
 sourceDirectoryDCM = os.path.join(pipelineDirectory, 'Data', 'InputData')
-outputDirectorySRC = os.path.join(pipelineDirectory, 'Output', 'src')
-outputDirectoryFIB = os.path.join(pipelineDirectory, 'Output', 'fib')
+allSetupPaths.append(sourceDirectoryDCM)
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Data', 'IntermediateData'))
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Data', 'AnalysisData'))
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Output', 'src'))
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Output', 'fib'))
+allSetupPaths.append(os.path.join(pipelineDirectory, 'Output', 'Figures'))
 ymd = date.today().strftime('%Y-%m-%d')
 
 def CreateDirs() -> None:
     # create directories
-    for path in [sourceDirectoryDCM, outputDirectorySRC, outputDirectoryFIB]:
+    for path in allSetupPaths:
         try:
             os.mkdir(path)
             print(f'\nCreated directory at: {path}!')

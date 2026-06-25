@@ -14,7 +14,7 @@ from Scripts.ProcessingScripts.DoMigration import CheckAndMigrate
 
 # Dev Options:
 VERSION = '''
-0.5.0
+1.0.0
 '''
 pipelineDirectory = os.getcwd()
 # End Dev Options
