@@ -38,7 +38,7 @@ def DoMigration()->None:
         newPath = MigrationMap[oldDirectory]
         try:
             Debug.Log(f'mv {oldPath} {newPath}', True)
-            #os.system(f'mv {oldPath} {newPath}')
+            os.system(f'mv {oldPath} {newPath}')
         except NotADirectoryError:
             Debug.Log(f'\nNo directory at: {oldPath}', True)
         except FileExistsError:
