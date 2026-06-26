@@ -136,7 +136,7 @@ def RunREC()->None:
 
 def RunQAExport()->None:
     
-    dockerCommand = f'docker run -it --rm -v {bidsDirectory}:/BIDS -v {reconOutputDirectory}:/fib dsistudio/dsistudio:latest'
+    dockerCommand = f'docker run -it --rm -v {reconOutputDirectory}:/fib dsistudio/dsistudio:latest'
 
     for subjectSession in os.listdir(reconOutputDirectory):
         thisdir = os.path.join(reconOutputDirectory, subjectSession)
@@ -149,7 +149,7 @@ def RunQAExport()->None:
         
         qcCommandPart = ''
         for fname in files:
-            if '*fib*' in fname:
+            if 'fib' in fname:
                 qcCommandPart = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa,iso,dti_fa,ad,md '
 
         if qcCommandPart == '':
