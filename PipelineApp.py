@@ -19,15 +19,12 @@ VERSION = '''
 pipelineDirectory = os.getcwd()
 # End Dev Options
 
-# class DSIButton():
-#     def __init__(self, qButton: QPushButton, name: str, action: function):
-#         self.name = name
-#         self.button = qButton
-#         self.action = action
-
-#     def doAction(self):
-#         print(f'DEBUG: Beginning action: {self.action} for button named: {self.name}')
-#         self.action()
+class DSIFunctionalButton(QPushButton):
+    """Custom QPushButton to eliminate boilerplate in MainWindow."""
+    def __init__(self, text: str, callback: callable, window_width: int, window_height: int):
+        super().__init__(text)
+        self.clicked.connect(callback)
+        self.setFixedSize(int(0.6 * window_width), int(0.1 * window_height))
 
 class InputDirChangePopUp(QDialog):
     def __init__(self, parent=None)->None:
@@ -121,8 +118,8 @@ class MainWindow(QMainWindow):
 
         self.label.setText("Attempting to set up directories...")
         self.makeButtonInactive(self.setupButton)
-        self.setupAction() # determined when button is initialized
         CheckAndMigrate()
+        self.setupAction() # determined when button is initialized
         self.label.setText("Setup complete!")
     
     def niftiButtonClick(self)->None:
@@ -138,7 +135,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will be converted to BIDS format:")
         source, ids, target = StatusChecker.niftiStatus(self.niftiDirectory)
         
-        Debug.Log(StatusChecker.niftiStatus(self.niftiDirectory), DEBUG)
+        Debug.Log(f'{source}, {ids} {target}', DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def niftiExecute(self)->None:
@@ -161,7 +158,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will be evaluated by MRIQC:")
         source, ids, target = StatusChecker.qcStatus()
         
-        Debug.Log(StatusChecker.qcStatus(), DEBUG)
+        Debug.Log(f'{source}, {ids} {target}', DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def mriqcButtonExecute(self)->None:
@@ -184,7 +181,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will go through Dsi Studio's SRC action:")
         source, ids, target = StatusChecker.srcStatus()
         
-        Debug.Log(StatusChecker.srcStatus(), DEBUG)
+        Debug.Log(f'{source}, {ids} {target}', DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def srcButtonExecute(self)->None:
@@ -207,7 +204,7 @@ class MainWindow(QMainWindow):
         self.displayRegion.append("The following ID's will go through Dsi Studio's REC action:")
         source, ids, target = StatusChecker.recStatus()
 
-        Debug.Log(StatusChecker.recStatus(), DEBUG)
+        Debug.Log(f'{source}, {ids} {target}', DEBUG)
         for id in ids:
             self.displayRegion.append(id)
     def recButtonExecute(self)->None:
@@ -243,6 +240,11 @@ class MainWindow(QMainWindow):
         result = addLowBToBIDS.FlipLOWBLocation()
         self.label.setText(result)
         return
+    
+    def tryExport(self)->None:
+        self.label.setText('Attempting to run DSI Studio qa export...')
+        runPipeline.RunQAExport()
+        self.label.setText('DSI Studio qa export is complete. Check Output/fib/ for desired data.')
     
     def toggleDisplay(self)->None:
         textOptions = ['Quality\nGraphs', 'Pipeline\nFunctions']
@@ -288,6 +290,10 @@ class MainWindow(QMainWindow):
         self.flipLowBButton.clicked.connect(self.flipLowB)
         self.flipLowBButton.setFixedSize(80, 45)
 
+        self.exportButton = QPushButton('Export\nQA')
+        self.exportButton.clicked.connect(self.tryExport)
+        self.exportButton.setFixedSize(80, 45)
+
         self.visualiserButton = QPushButton("Quality\nGraphs")
         self.visualiserButton.clicked.connect(self.toggleDisplay)
         self.visualiserButton.setFixedSize(80, 45)
@@ -308,6 +314,7 @@ class MainWindow(QMainWindow):
         """)
         toolbar.addWidget(self.visualiserButton)
         toolbar.addWidget(self.flipLowBButton)
+        toolbar.addWidget(self.exportButton)
         toolbar.addWidget(self.refreshButton)
         
         return
@@ -495,45 +502,28 @@ class MainWindow(QMainWindow):
         vButtons.addWidget(self.label)
 
         ### make setup button
+
+        def addActionButton(text: str, callback: callable) -> DSIFunctionalButton:
+            btn = DSIFunctionalButton(text, callback, self.WIDTH, self.HEIGHT)
+            vButtons.addWidget(btn)
+            self.actionButtons.append(btn)
+            return btn
+
         setupDirsExist = StatusChecker.SetupDirsStatus()
         if setupDirsExist:
             Debug.Log(f'Setup not needed.', DEBUG)
         else:
             Debug.Log(f'Directories have not yet been set up. Doing that now...', DEBUG)
-            self.setupButton = QPushButton("Set up directories")
+            self.setupButton = addActionButton("Set up directories", self.setupButtonClick)
             self.setupAction = setupPipeline.main
-            self.setupButton.clicked.connect(self.setupButtonClick)
-            self.setupButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-            vButtons.addWidget(self.setupButton)
-            self.actionButtons.append(self.setupButton)
 
-        ### make nifti button
-        self.niftiButton = QPushButton("Move nifti files to BIDS directory")
-        self.niftiButton.clicked.connect(self.niftiButtonClick)
-        self.niftiButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-        vButtons.addWidget(self.niftiButton)
-        self.actionButtons.append(self.niftiButton)
+        self.niftiButton = addActionButton("Move nifti files to BIDS directory", self.niftiButtonClick)
 
-        ### make mriqc button
-        self.mriqcButton = QPushButton("Run MRIQC for anatomical data")
-        self.mriqcButton.clicked.connect(self.mriqcButtonClick)
-        self.mriqcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-        vButtons.addWidget(self.mriqcButton)
-        self.actionButtons.append(self.mriqcButton)
-
-        ### make src button
-        self.srcButton = QPushButton("Run DSI Studio src action for diffusion data")
-        self.srcButton.clicked.connect(self.srcButtonClick)
-        self.srcButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-        vButtons.addWidget(self.srcButton)
-        self.actionButtons.append(self.srcButton)
-
-        ### make rec button
-        self.recButton = QPushButton("Run DSI Studio rec action for diffusion data")
-        self.recButton.clicked.connect(self.recButtonClick)
-        self.recButton.setFixedSize(int(.6*self.WIDTH), int(.1*self.HEIGHT))
-        vButtons.addWidget(self.recButton)
-        self.actionButtons.append(self.recButton)
+        self.mriqcButton = addActionButton("Run MRIQC for anatomical data", self.mriqcButtonClick)
+        
+        self.srcButton = addActionButton("Run DSI Studio src action for diffusion data", self.srcButtonClick)
+        
+        self.recButton = addActionButton("Run DSI Studio rec action for diffusion data", self.recButtonClick)
 
         ### make run button
         self.execButton = QPushButton("Execute Selected")
