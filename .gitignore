@@ -14,3 +14,10 @@ lowBFiles
 *Ignore*
 *pycache*
 .vscode
+Data/AnalysisData
+Data/InputData
+Data/IntermediatedData
+Output/fib
+Output/src
+Output/Figures
+Output/QCOutput
