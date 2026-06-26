@@ -134,7 +134,7 @@ def RunREC()->None:
 
 
 
-def RunQAExtract()->None:
+def RunQAExport()->None:
     
     dockerCommand = f'docker run -it --rm -v {bidsDirectory}:/BIDS -v {reconOutputDirectory}:/fib dsistudio/dsistudio:latest'
 
