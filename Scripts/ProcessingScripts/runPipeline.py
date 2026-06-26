@@ -148,11 +148,16 @@ def RunQAExport()->None:
             continue
         
         qcCommandPart = ''
+        skip = False
+        
         for fname in files:
             if 'fib' in fname:
                 qcCommandPart = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa,iso,dti_fa'
             if '.qa.' in fname or '.iso.' in fname or '.dti_fa' in fname:
-                continue
+                skip = True
+
+        if skip:
+            continue
 
         if qcCommandPart == '':
             Debug.Log(f'Could not find target fib file needed to construct qa extraction command.')
