@@ -16,7 +16,7 @@ lowBFiles
 .vscode
 Data/AnalysisData
 Data/InputData
-Data/IntermediatedData
+Data/IntermediateData
 Output/fib
 Output/src
 Output/Figures
