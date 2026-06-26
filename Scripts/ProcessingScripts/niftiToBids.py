@@ -58,7 +58,7 @@ def getFileName(file, sub):
     if '.' in newName: return newName, dest
     else: return None, None
 
-def DoDicomToNifti(input = dicomDirectory)->None:
+def DoDicomToNifti(input:str = dicomDirectory)->None:
     try:
         os.mkdir(niftiDirectory)
     except Exception as e:
