@@ -162,7 +162,31 @@ def RunREC()->None:
 
 def RunQAExtract()->None:
     
-    pass
+    dockerCommand = f'docker run -it --rm -v {bidsDirectory}:/BIDS -v {reconOutputDirectory}:/fib dsistudio/dsistudio:latest'
+
+    for subjectSession in os.listdir(reconOutputDirectory):
+        thisdir = os.path.join(reconOutputDirectory, subjectSession)
+
+        try:
+            files = os.listdir(thisdir)
+        except Exception as e:
+            Debug.Log(f'\n{e}\n\tDirectory Empty For {subjectSession}!!!\n\tContinuing.....')
+            continue
+        
+        qcCommandPart = ''
+        for fname in files:
+            if '*fib*' in fname:
+                qcCommandPart = f'dsi_studio --action=exp --source=/fib/{subjectSession}/{fname} --export=qa,iso,dti_fa,ad,md '
+
+        if qcCommandPart == '':
+            Debug.Log(f'Could not find target fib file needed to construct qa extraction command.')
+            continue
+        
+        fullCommandQC = f'{dockerCommand} {qcCommandPart}'
+
+        # if os.path.exists(os.path.join(thisdir, 'qc.tsv')) == False:
+        Debug.Log(f'{fullCommandQC}')
+        os.system(fullCommandQC)
 
 
 # def RunSRCSingularity()->None:
