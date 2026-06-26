@@ -9,9 +9,11 @@ qc = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
 src = os.path.join(pipelineDirectory, 'Output', 'src')
 fib = os.path.join(pipelineDirectory, 'Output', 'fib')
 
+DEBUG = False
+
 def compareContents(source:str, target:str)->tuple[set, set, set]:
     if os.path.isdir(source) == False:
-        Debug.Log(f'{source}\nis empty.')
+        Debug.Log(f'{source}\nis empty.', DEBUG)
         return set(), set(), set()
     
     sourceSet = set()
@@ -37,9 +39,9 @@ def compareContents(source:str, target:str)->tuple[set, set, set]:
         return sourceSet, sourceSet, set()
     
     targetSet = set()
-    Debug.Log(f'{target}')
+    Debug.Log(f'{target}', DEBUG)
     for f in os.listdir(target):
-        Debug.Log(f'{f}')
+        Debug.Log(f'{f}', DEBUG)
         if '.' in f:
             continue
         for remove in ['sub-', '_', 'ses-1', 'ses-2']:
