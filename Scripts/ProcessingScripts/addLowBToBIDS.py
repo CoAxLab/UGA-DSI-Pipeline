@@ -14,6 +14,8 @@ def FlipLOWBLocation()->str:
     toBids = False
     # toLowB = False
     Debug.Log(f'Moving low-b files. Outputs should all match.')
+    if not os.path.isdir(parentBIDS):
+        return 'No files have moved!'
     for id in os.listdir(parentBIDS):
         subBIDS = os.path.join(parentBIDS, id)
         if os.path.isdir(subBIDS) == False:
