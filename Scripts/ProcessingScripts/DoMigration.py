@@ -10,7 +10,8 @@ MigrationMap = {
     'src': os.path.join(pipelineDir, 'Output', 'src'),
     'fib': os.path.join(pipelineDir, 'Output', 'fib'),
     'QCOutput': os.path.join(pipelineDir, 'Output', 'QCOutput'),
-    'Figures': os.path.join(pipelineDir, 'Output', 'Figures')
+    'Figures': os.path.join(pipelineDir, 'Output'),
+    'work': os.path.join(pipelineDir, 'Data', 'IntermediateData')
 }
 
 
@@ -31,8 +32,11 @@ def DoMigration()->None:
     Performs TIER migration by moving directories.
     '''
     Debug.Log('\nPerforming TIER migration...')
-    addLowBToBIDS.FlipLOWBLocation() # Moves any files from lowBFiles/ to BIDS/
-    migrationTargets = ['BIDS', 'convertToBids', 'fib', 'src', 'QCOutput', 'Figures']
+    try:
+        addLowBToBIDS.FlipLOWBLocation() # Moves any files from lowBFiles/ to BIDS/
+    except Exception as e:
+        Debug.Log(f'{e}: Not flipping lowB, no lowB to flip')
+    migrationTargets = ['BIDS', 'convertToBids', 'fib', 'src', 'QCOutput', 'Figures', 'work']
     for oldDirectory in migrationTargets:
         oldPath = os.path.join(pipelineDir, oldDirectory)
         newPath = MigrationMap[oldDirectory]
