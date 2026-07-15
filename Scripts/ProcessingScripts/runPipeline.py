@@ -28,7 +28,7 @@ def RunSRC()->None:
                 os.mkdir(subSesSRCDir)
             except FileExistsError:
                 Debug.Log(f'src output folder already created for {subSesTag}...')
-                #continue
+                continue
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
             niftisWildCard = os.path.join(niftiInDirectory, '*.nii.gz')
