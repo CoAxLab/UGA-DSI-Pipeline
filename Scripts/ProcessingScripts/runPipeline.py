@@ -32,7 +32,7 @@ def RunSRC()->None:
 
             niftiInDirectory = os.path.join('/BIDS', subjID, sesDir, 'dwi')
             niftisWildCard = os.path.join(niftiInDirectory, '*.nii.gz')
-            absNiftiPath = os.path.join(pipelineDirectory, 'BIDS', subjID, sesDir, 'dwi')
+            absNiftiPath = os.path.join(bidsDirectory, subjID, sesDir, 'dwi')
             singleSRCOutFile = os.path.join('/src', subSesTag, f'{subjID}_{sesDir}.src.gz')
 
             niftiTargets = ''
