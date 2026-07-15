@@ -154,7 +154,7 @@ def NiftiToBIDS(inputDir:str = None)->None:
                     break
 
             if foundFile == False:
-                DoDicomToNifti()
+                DoDicomToNifti(currNifti)
             
             for fileToMove in os.listdir(currNifti):
                 # Begin sorting files from nifti directory
