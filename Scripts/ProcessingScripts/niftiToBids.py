@@ -22,7 +22,7 @@ def getFileName(file, sub):
         # file is for dwi
         dest = 'dwi'
         # add dir tag
-        if 'x_' in file:
+        if 'x_' in file or '!' in file:
             newName = f'{newName}_dir-rev' 
         else:
             newName = f'{newName}_dir-std' 
@@ -58,17 +58,40 @@ def getFileName(file, sub):
     if '.' in newName: return newName, dest
     else: return None, None
 
-def DoDicomToNifti(input:str = dicomDirectory)->None:
-    try:
-        os.mkdir(niftiDirectory)
-    except Exception as e:
-        Debug.Log(f'{e}')
-    for sub in os.listdir(input):
-        pathToDcm = os.pat.join(input, sub)
-        outPath = os.path.join(niftiDirectory, sub)
-        ## Make this correct................................................................................
-        dcmCommand = f'dcm2niix --input={pathToDcm} --output={outPath}'
-        os.system(dcmCommand)
+def DoDicomToNifti(sesPath:str)->None:
+    '''
+    Run dcm2niix on DICOM folder.
+    Read nifti output JSON to rename newly created files.
+    '''
+
+    dcmCommand = f'dcm2niix -z y -b y -f "%d" {sesPath}'
+    os.system(dcmCommand)
+
+    # for file in os.listdir(sesPath):
+        
+    #     filePath = os.path.join(sesPath, file)
+
+    #     if os.path.isdir(filePath):
+    #         Debug.Log(f'Searching for JSON... Skipping {file}...')
+    #         continue
+
+        
+    #     baseName = file.replace('.json', '')
+
+    #     try:
+    #         with open(jsonPath, "r") as f:
+    #             scanData = json.load(f)
+    #     except (json.JSONDecodeError, OSError) as e:
+    #         Debug.Log(f"Skipping '{baseName}': could not read/parse JSON ({e})")
+    #         continue
+
+    #     if "SeriesDescription" not in scanData:
+    #             Debug.Log(f"Skipping '{baseName}': key 'SeriesDescription' not found in JSON")
+    #             continue
+    #     newName = str(scanData["SeriesDescription"]).strip()
+    #     if not newName:
+    #         print(f"Skipping '{baseName}': 'SeriesDescription' value is empty")
+    #         continue
 
 def NiftiToBIDS(inputDir:str = None)->None:
     setup = False
@@ -92,7 +115,13 @@ def NiftiToBIDS(inputDir:str = None)->None:
     for subjID in os.listdir(inputDir):
         allSubIDs.append(subjID)
         currSubDir = os.path.join(inputDir, subjID)
-        outDirectory = os.path.join(parentBIDS, f'sub-{subjID}')
+
+        if 'sub-' in subjID:
+            addSubTag = f''
+        else:
+            addSubTag = f'sub-'
+
+        outDirectory = os.path.join(parentBIDS, f'{addSubTag}{subjID}')
 
         skip = False
 
@@ -104,21 +133,35 @@ def NiftiToBIDS(inputDir:str = None)->None:
         if skip == True:
             continue
 
-        sesN = 1
+        #sesN = 1
         for sesID in os.listdir(currSubDir):
             currNifti = os.path.join(currSubDir, sesID)
-            sesOutDir = os.path.join(outDirectory, f'ses-{sesN}')
+            sessionTag = sesID
+            if 'ses-' not in sessionTag:
+                sessionTag = f'ses-{sessionTag}'
+            sesOutDir = os.path.join(outDirectory, sessionTag)
             os.mkdir(sesOutDir)
 
             anatDir = os.path.join(sesOutDir, 'anat')
             dwiDir = os.path.join(sesOutDir, 'dwi')
             os.mkdir(anatDir)
             os.mkdir(dwiDir)
+
+            foundFile = False
+            for content in os.listdir(currNifti):
+                if not os.path.isdir(os.path.join(currNifti, content)):
+                    foundFile = True
+                    break
+
+            if foundFile == False:
+                DoDicomToNifti()
             
             for fileToMove in os.listdir(currNifti):
                 # Begin sorting files from nifti directory
                 oldFile = os.path.join(currNifti, fileToMove)
-                subSesTag = f'sub-{subjID}_ses-{sesN}'
+                if os.path.isdir(oldFile):
+                    continue # skip DICOM directories if they exist
+                subSesTag = f'{addSubTag}{subjID}_{sessionTag}'
                 newFile, destination = getFileName(fileToMove, subSesTag)
                 if destination == 'anat':
                     toHere = os.path.join(anatDir, newFile)
@@ -141,7 +184,7 @@ def NiftiToBIDS(inputDir:str = None)->None:
                 copyCMD = f'cp {oldFile} {toHere}'
 
                 os.system(copyCMD)
-            sesN += 1
+            #sesN += 1
 
 
 def main()->None:
