@@ -14,6 +14,12 @@ MigrationMap = {
     'work': os.path.join(pipelineDir, 'Data', 'IntermediateData')
 }
 
+SecondaryMap = {
+    'src': os.path.join(pipelineDir, 'Data', 'IntermediateData', 'src'),
+    'fib': os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives', 'fib'),
+    'QCOutput': os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives', 'QCOutput')
+}
+
 
 
 def NeedMigration()->bool:
@@ -24,6 +30,16 @@ def NeedMigration()->bool:
     migrationTargets = ['BIDS', 'convertToBids', 'fib', 'src', 'QCOutput', 'Figures']
     for target in migrationTargets:
         if target in items:
+            return True
+    return False
+
+def NeedSecondaryMigration()->bool:
+    '''
+    Checks pipeline status to determine if secondary migration is required.
+    '''
+    for item in ['fib', 'QCOutput', 'src']:
+        pathToCheck = MigrationMap[item]
+        if os.path.isdir(pathToCheck):
             return True
     return False
 
@@ -48,9 +64,32 @@ def DoMigration()->None:
         except FileExistsError:
             Debug.Log(f'\nFile path: {newPath} already exists!', True)
 
+def DoSecondaryMigration()->None:
+    '''
+    Performs secondary migration by moving directories to targets.
+    '''
+    try:
+        #os.mkdir(os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives'))
+        Debug.Log(f'Make Dir.... dry run', True)
+    except Exception as e:
+        Debug.Log(f'{e}', True)
+    for key in SecondaryMap:
+        oldPath = MigrationMap[key]
+        newPath = SecondaryMap[key]
+        try:
+            Debug.Log(f'mv {oldPath} {newPath}', True)
+            #os.system(f'mv {oldPath} {newPath}')
+        except NotADirectoryError:
+            Debug.Log(f'\nNo directory at: {oldPath}', True)
+        except FileExistsError:
+            Debug.Log(f'\nFile path: {newPath} already exists!', True)
+
+
 def CheckAndMigrate() -> None:
     if NeedMigration():
         DoMigration()
+    if NeedSecondaryMigration():
+        DoSecondaryMigration()
     print('\nTIER migration complete!')
     print('Please check the BIDS directory for migrated files.')
 
