@@ -17,9 +17,6 @@ lowBFiles
 Data/AnalysisData
 Data/InputData
 Data/IntermediateData
-Output/fib
-Output/src
-Output/Figures
-Output/QCOutput
+Output/*
 Software/*
 Training/*
