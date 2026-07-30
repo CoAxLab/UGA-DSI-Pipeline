@@ -71,8 +71,8 @@ def DoSecondaryMigration()->None:
     Performs secondary migration by moving directories to targets.
     '''
     try:
-        #os.mkdir(os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives'))
-        Debug.Log(f'Make Dir.... dry run', True)
+        os.mkdir(os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives'))
+        #Debug.Log(f'Make Dir.... dry run', True)
     except Exception as e:
         Debug.Log(f'{e}', True)
     for key in SecondaryMap:
@@ -80,7 +80,7 @@ def DoSecondaryMigration()->None:
         newPath = SecondaryMap[key]
         try:
             Debug.Log(f'mv {oldPath} {newPath}', True)
-            #os.system(f'mv {oldPath} {newPath}')
+            os.system(f'mv {oldPath} {newPath}')
         except NotADirectoryError:
             Debug.Log(f'\nNo directory at: {oldPath}', True)
         except FileExistsError:
@@ -97,7 +97,7 @@ def CheckAndMigrate() -> None:
 def SecondaryCheckAndMigrate()->None:
     if NeedSecondaryMigration():
         DoSecondaryMigration()
-        
+
     Debug.Log('\nTIER migration complete!')
     Debug.Log('Please check the BIDS directory for migrated files.')
 
