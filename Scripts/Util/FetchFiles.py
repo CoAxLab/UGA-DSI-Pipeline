@@ -5,7 +5,7 @@ from Scripts.Util import Debug
 
 pipelineDir = os.getcwd()
 figures = os.path.join(pipelineDir, 'Output', 'Figures')
-fibFiles = os.path.join(pipelineDir, 'Output', 'fib')
+fibFiles = os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives', 'fib')
 
 def MakeFigures()->tuple[dict, dict, dict]:
     t1Dict, t2Dict = qualityDistributions.RunAnatomical()

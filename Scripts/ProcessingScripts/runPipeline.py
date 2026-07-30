@@ -4,9 +4,9 @@ from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
 #sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
-bidsDirectory = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
-outputDirectorySRC = os.path.join(pipelineDirectory, 'Output', 'src')
-reconOutputDirectory = os.path.join(pipelineDirectory, 'Output', 'fib')
+bidsDirectory = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'BIDS')
+outputDirectorySRC = os.path.join(pipelineDirectory, 'Data', 'IntermediateData', 'src')
+reconOutputDirectory = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'fib')
 
 
 

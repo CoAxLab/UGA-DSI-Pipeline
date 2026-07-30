@@ -4,7 +4,7 @@ from Scripts.Util import Debug
 pipelineDirectory = os.getcwd()
 dicomDirectory = os.path.join(pipelineDirectory, 'Data', 'DICOM')
 niftiDirectory = os.path.join(pipelineDirectory, 'Data', 'InputData')
-parentBIDS = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
+parentBIDS = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'BIDS')
 
 DEBUG = False
 
@@ -128,7 +128,7 @@ def NiftiToBIDS(inputDir:str = None)->None:
         try:
             os.mkdir(outDirectory)
         except Exception as e:
-            Debug.Log(f'BIDS output directories (at Data/AnalysisData/) already exist for {subjID}.\nMoving on...', DEBUG)
+            Debug.Log(f'BIDS output directories (at Data/AnalysisData/BIDS/) already exist for {subjID}.\nMoving on...', DEBUG)
             skip = True
         if skip == True:
             continue

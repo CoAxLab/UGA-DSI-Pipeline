@@ -3,11 +3,11 @@ from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
 nifti = os.path.join(pipelineDirectory, 'Data', 'InputData')
-bids = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
+bids = os.path.join(pipelineDirectory, 'Data', 'AnalysisData','BIDS')
 
-qc = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
-src = os.path.join(pipelineDirectory, 'Output', 'src')
-fib = os.path.join(pipelineDirectory, 'Output', 'fib')
+qc = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'QCOutput')
+src = os.path.join(pipelineDirectory, 'Data', 'IntermediateData', 'src')
+fib = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'fib')
 
 DEBUG = False
 

@@ -3,9 +3,9 @@ from Scripts.Util import Debug
 
 pipelineDirectory = os.getcwd()
 
-sourceDirectoryBids = os.path.join(pipelineDirectory, 'Data', 'AnalysisData')
-outDirectoryQC = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
-workDirectory = os.path.join(pipelineDirectory, 'Data','IntermediateData')
+sourceDirectoryBids = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'BIDS')
+outDirectoryQC = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'QCOutput')
+workDirectory = os.path.join(pipelineDirectory, 'Data','IntermediateData', 'work')
 
 
 
