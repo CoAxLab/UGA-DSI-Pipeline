@@ -21,3 +21,5 @@ Output/fib
 Output/src
 Output/Figures
 Output/QCOutput
+Software/*
+Training/*
