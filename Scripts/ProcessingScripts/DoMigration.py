@@ -15,6 +15,8 @@ MigrationMap = {
 }
 
 SecondaryMap = {
+    'BIDS': os.path.join(pipelineDir, 'Data', 'AnalysisData', 'BIDS'),
+    'work': os.path.join(pipelineDir, 'Data', 'IntermediateData', 'work'),
     'src': os.path.join(pipelineDir, 'Data', 'IntermediateData', 'src'),
     'fib': os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives', 'fib'),
     'QCOutput': os.path.join(pipelineDir, 'Data', 'AnalysisData', 'Derivatives', 'QCOutput')
@@ -88,10 +90,16 @@ def DoSecondaryMigration()->None:
 def CheckAndMigrate() -> None:
     if NeedMigration():
         DoMigration()
+
+    Debug.Log('\nTIER migration complete!')
+    Debug.Log('Please check the BIDS directory for migrated files.')
+
+def SecondaryCheckAndMigrate()->None:
     if NeedSecondaryMigration():
         DoSecondaryMigration()
-    print('\nTIER migration complete!')
-    print('Please check the BIDS directory for migrated files.')
+        
+    Debug.Log('\nTIER migration complete!')
+    Debug.Log('Please check the BIDS directory for migrated files.')
 
 if __name__ == '__main__':
     CheckAndMigrate()

@@ -10,8 +10,8 @@ Globals and setup
 '''
 pipelineDirectory = os.getcwd()
 figuresOutput = os.path.join(pipelineDirectory, 'Output', 'Figures')
-fibDirectory = os.path.join(pipelineDirectory, 'Output', 'fib')
-qcOutputDirectory = os.path.join(pipelineDirectory, 'Output', 'QCOutput')
+fibDirectory = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'fib')
+qcOutputDirectory = os.path.join(pipelineDirectory, 'Data', 'AnalysisData', 'Derivatives', 'QCOutput')
 #sifDirectory = os.path.join(pipelineDirectory, 'SingularitySIFs')
 #sifFile = os.path.join(sifDirectory, 'dsistudio_latest.sif')
 #singularityCommand = f'singularity exec -B {fibDirectory}:/fib {sifFile}'
